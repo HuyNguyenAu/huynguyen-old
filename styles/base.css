@@ -1,4 +1,4 @@
-html, body {
+body {
   height: 100%;
   font-family: 'Roboto', sans-serif;
 }
@@ -14,22 +14,22 @@ html, body {
 }
 
 .left-border-red {
-  padding: 0 0.25em 0 0.25em;
+  padding: 0em 0.25em 0em 0.25em;
   border-left: 6px solid #cc6666;
 }
 
 .left-border-blue {
-  padding: 0 0.25em 0 0.25em;
+  padding: 0em 0.25em 0em 0.25em;
   border-left: 6px solid #6699cc;
 }
 
 .left-border-green {
-  padding: 0 0.25em 0 0.25em;
+  padding: 0em 0.25em 0em 0.25em;
   border-left: 6px solid #66cc66;
 }
 
 .left-border-purple {
-  padding: 0 0.25em 0 0.25em;
+  padding: 0em 0.25em 0em 0.25em;
   border-left: 6px solid #6666cc;
 }
 
