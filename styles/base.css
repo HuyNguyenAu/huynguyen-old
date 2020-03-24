@@ -1,3 +1,35 @@
-body {
+html, body {
+  height: 100%;
   font-family: 'Roboto', sans-serif;
 }
+
+.hello {
+  background-color: #cc6666;
+  width: 70px;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+  position: relative;
+  color: #fff;
+}
+
+.left-border-red {
+  padding: 0 0.25em 0 0.25em;
+  border-left: 6px solid #cc6666;
+}
+
+.left-border-blue {
+  padding: 0 0.25em 0 0.25em;
+  border-left: 6px solid #6699cc;
+}
+
+.left-border-green {
+  padding: 0 0.25em 0 0.25em;
+  border-left: 6px solid #66cc66;
+}
+
+.left-border-purple {
+  padding: 0 0.25em 0 0.25em;
+  border-left: 6px solid #6666cc;
+}
+
