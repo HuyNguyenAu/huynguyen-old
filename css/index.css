@@ -1,0 +1,68 @@
+a {
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+body {
+    font-family: sans-serif;
+}
+
+.content {
+    margin: 1.5em 3em;
+}
+
+.menu > a {
+    margin-right: 1em;
+    color: #222;
+}
+
+.article {
+    margin-bottom: 3em;
+}
+
+.article-title {
+    font-size: 2em;
+    color: #222;
+    margin-bottom: 0.2em;
+}
+
+.article-subtitle {
+    color: #999;
+    font-size: 90%;
+    margin-top: 0em;
+}
+
+.article-subtitle > a {
+    color: rgb(61, 146, 201);
+}
+
+.article-subtitle > .article-category {
+    background: #8156a7;
+    /* Set font size as a percentage relative to the
+    parent's font size. */
+    font-size: 80%;
+    /* Padding vertical and horizontal. */ 
+    padding: 0.3em 1em;
+    color: #fff;
+}
+
+.article-body {
+    font-family: Georgia, "Cambria", serif;
+    color: #444;
+    /* Set the distance between the lines of text. */
+    line-height: 1.8em;
+}
+
+.article-body > img {
+    /* Restrict the max width of the parent block.
+    Makes sure the image does not exceed the width of the parent block. */
+    max-width: 100%;
+    /* Determine the height based off parent block. */
+    height: auto;
+    /* Display on a new line. */
+    display: block;
+    margin-top: 1em;
+}
