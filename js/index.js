@@ -1,15 +1,23 @@
-window.addEventListener('load', function () {
-    load();
-});
+window.addEventListener('load', onLoadEvent);
+window.addEventListener('hashchange', onHashChangeEvent);
 
-window.onhashchange  = function (event) {
-    console.log(event.newURL.split('/').pop());
-    if (event.newURL.split('/').pop() === 'index.html') {
-        load();
+function onLoadEvent() {
+    // Clear out any existing content.
+    document.getElementById('content').innerHTML = '';
+
+    if (document.location.hash.length > 0) {
+        showArticle('https://raw.githubusercontent.com/HuyNguyenAu/huynguyen/master/html/' + document.location.hash.replace('#', ''));
     } else {
-        showArticle('https://raw.githubusercontent.com/HuyNguyenAu/huynguyen/master/html/' + event.newURL.split('#').pop());
+        showHome();
     }
-};
+}
+
+function onHashChangeEvent(event) {
+  // Debug
+  console.log(event.newURL.split('/').pop());
+
+  onLoadEvent();
+}
 
 async function get(url) {
     return fetch(url)
@@ -26,8 +34,6 @@ function getArticles() {
 function createItem(html, url) {
     let temp = document.createElement('temp');
     temp.innerHTML = html;
-
-    console.log(title.outerHTML);
 
     let title = temp.querySelector('.article-title');
     title.setAttribute('link', url);
@@ -46,30 +52,20 @@ function createItem(html, url) {
     return temp.innerHTML;
 }
 
-function showArticle(url) {
-    get(url).then((html) => {
-        document.getElementById('articles').innerHTML = html;
+function showHome() {
+    getArticles().then((json) => {
+        let articles = JSON.parse(json);
+
+        articles.articles.forEach(url => {
+            get(url).then((html) => {
+                document.getElementById('content').innerHTML += createItem(html, url);
+            })
+        });
     });
 }
 
-function load() {
-    document.getElementById('articles').innerHTML = '';
-
-    if (document.location.hash.length > 0) {
-        showArticle('https://raw.githubusercontent.com/HuyNguyenAu/huynguyen/master/html/' + document.location.hash.replace('#', ''));
-    } else {
-        getArticles().then((json) => {
-            let articles = JSON.parse(json);
-    
-            articles.articles.forEach(url => {
-                get(url).then((html) => {
-                    document.getElementById('articles').innerHTML += createItem(html, url);
-    
-                    document.querySelectorAll('.article-title')[0].onclick = function() {
-                        showArticle(this.getAttribute("link"));
-                    };
-                })
-            });
-        });
-    }
+function showArticle(url) {
+    get(url).then((html) => {
+        document.getElementById('content').innerHTML = html;
+    });
 }
