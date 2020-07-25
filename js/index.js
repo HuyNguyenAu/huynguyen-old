@@ -5,25 +5,35 @@ function onLoadEvent() {
     // Clear out any existing content.
     document.getElementById('content').innerHTML = '';
 
-    if (document.location.hash.length > 0) {
-        showArticle('https://raw.githubusercontent.com/HuyNguyenAu/huynguyen/master/html/' + document.location.hash.replace('#', ''));
-    } else {
-        showHome();
+    switch (document.location.hash) {
+        case '':
+            location.hash = '#home';
+            break;
+        case '#home':
+            showHome();
+            break;
+        default:
+            showArticle('https://raw.githubusercontent.com/HuyNguyenAu/huynguyen/master/html/' + document.location.hash.replace('#', ''));
+            break;
     }
 }
 
 function onHashChangeEvent(event) {
-  // Debug
-  console.log(event.newURL.split('/').pop());
-
-  onLoadEvent();
+    onLoadEvent();
 }
 
-async function get(url) {
+async function get(url, callback) {
     return fetch(url)
-        .then((response) => response.text())
+        .then((response) => {
+            if (response.ok) {
+                return response.text();
+            } else {
+                throw new Error('Failed to load ' + url);
+            }
+        })
+        .then((content) => callback(content, url))
         .catch((error) => {
-            console.warn(error);
+            console.log(error);
         });
 }
 
@@ -31,16 +41,20 @@ function getArticles() {
     return get('https://raw.githubusercontent.com/HuyNguyenAu/huynguyen/master/json/articles.json');
 }
 
-function createItem(html, url) {
+function createArticle(html, url) {
     let temp = document.createElement('temp');
     temp.innerHTML = html;
 
     let title = temp.querySelector('.article-title');
+    /* Add link to .article-title so when the user clicks on the title,
+   we can get that link to load the article into the content. */
     title.setAttribute('link', url);
-    title.outerHTML = '<a href="#' + url.split('/').pop() +'">' + title.outerHTML + "</a>";
+    /* Wrap the header in a link so it give the user visual feedback of a link. */
+    title.outerHTML = '<a href="#' + url.split('/').pop() + '">' + title.outerHTML + "</a>";
 
     let paragraphs = temp.querySelectorAll('.article-body p');
 
+    /* Transform the article into an item. */
     for (let i = 0; i < paragraphs.length; i++) {
         if (i === 0) {
             paragraphs[i].classList.add('truncate');
@@ -53,19 +67,17 @@ function createItem(html, url) {
 }
 
 function showHome() {
-    getArticles().then((json) => {
-        let articles = JSON.parse(json);
-
-        articles.articles.forEach(url => {
-            get(url).then((html) => {
-                document.getElementById('content').innerHTML += createItem(html, url);
-            })
+    get('https://raw.githubusercontent.com/HuyNguyenAu/huynguyen/master/json/articles.json', function (json) {
+        JSON.parse(json).articles.forEach(url => {
+            get(url, function (article, url) {
+                document.getElementById('content').innerHTML += createArticle(article, url);
+            });
         });
     });
 }
 
 function showArticle(url) {
-    get(url).then((html) => {
+    get(url, function (html) {
         document.getElementById('content').innerHTML = html;
-    });
+    })
 }
