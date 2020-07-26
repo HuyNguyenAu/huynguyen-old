@@ -80,7 +80,7 @@ function createArticle(html, url) {
    we can get that link to load the article into the content. */
     title.setAttribute('link', url);
     /* Wrap the header in a link so it give the user visual feedback of a link. */
-    title.outerHTML = '<a href="#' + url.split('/').pop().replace('.html', '') + '">' + title.outerHTML + "</a>";
+    title.outerHTML = '<a class="article-title-link" href="#' + url.split('/').pop().replace('.html', '') + '">' + title.outerHTML + "</a>";
 
     let paragraphs = temp.querySelectorAll('.article-body p');
 
