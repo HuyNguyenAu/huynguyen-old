@@ -6,17 +6,20 @@ a:hover {
     text-decoration: underline;
 }
 
+a:visited {
+    color: #222;
+}
+
 body {
     font-family: sans-serif;
 }
 
-.container {
-    margin: 1.5em 3em;
-}
-
 .menu > a {
     margin-right: 1em;
-    color: #222;
+}
+
+.container {
+    margin: 1.5em 3em;
 }
 
 .article {
@@ -27,6 +30,10 @@ body {
     font-size: 2em;
     color: #222;
     margin-bottom: 0.2em;
+}
+
+.article-title-link {
+    color: #222;
 }
 
 .article-subtitle {
