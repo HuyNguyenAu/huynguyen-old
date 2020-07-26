@@ -1,3 +1,7 @@
+html, body {
+    scroll-behavior: smooth;
+}
+
 a {
     text-decoration: none;
 }
@@ -26,11 +30,11 @@ body {
 }
 
 .container {
-    margin: 1.5em 3em;
+    margin: 1.5em 6em;
 }
 
 .article {
-    margin-bottom: 3em;
+    margin-bottom: 6em;
 }
 
 .article-header > a {
