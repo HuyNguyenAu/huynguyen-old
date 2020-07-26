@@ -30,9 +30,9 @@ function showError(error) {
 
 function showHome() {
     get('https://raw.githubusercontent.com/HuyNguyenAu/huynguyen/master/json/articles.json', function (json) {
-        JSON.parse(json).articles.forEach(url => {
-            get(url, function (article, url) {
-                document.getElementById('content').innerHTML += createArticle(article, url);
+        JSON.parse(json).articles.forEach(article => {
+            get(article.url, function (html, url) {
+                document.getElementById('content').innerHTML += createArticle(html, url);
             });
         });
     });
