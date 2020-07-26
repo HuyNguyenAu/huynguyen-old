@@ -1,5 +1,11 @@
 {
     "articles": [
-        "https://raw.githubusercontent.com/HuyNguyenAu/huynguyen/master/html/proident_laborum.html"
+        {
+            "title": "Proident laborum",
+            "author": "Praesent consectetur",
+            "category": "test",
+            "date": "03/03/2020",
+            "url": "https://raw.githubusercontent.com/HuyNguyenAu/huynguyen/master/html/proident_laborum.html"
+        }
     ]
 }
