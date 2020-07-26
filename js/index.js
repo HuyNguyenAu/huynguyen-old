@@ -7,23 +7,7 @@ let y = 0;
 
 window.addEventListener('load', onLoadEvent);
 window.addEventListener('hashchange', onHashChangeEvent);
-window.onpopstate = function() {
-    console.log("onpopstate: " + document.location.hash + ", " + window.scrollY);
-    y = window.scrollY;
-  };
-
-function onHashChangeEvent(event) {
-    console.log("onHashChangeEvent: " + '#' + event.oldURL.split('#').pop() + ", " + '#' + event.newURL.split('#').pop() + ", " + window.scrollY);
-    
-    let hash = '#' + event.oldURL.split('#').pop();
-    hist[hash] = y;
-
-    // for (let key in hist) {
-    //     console.log(key + ', ' + hist[key]);
-    // }
-
-    onLoadEvent();
-}
+window.addEventListener('popstate', onPopStateEvent);
 
 function onLoadEvent() {
     let hash = document.location.hash;
@@ -35,6 +19,31 @@ function onLoadEvent() {
     } else {
         showArticle(hash);
     }
+}
+
+function onHashChangeEvent(event) {
+    console.log("onHashChangeEvent: " + '#' + event.oldURL.split('#').pop() + ", " + '#' + event.newURL.split('#').pop() + ", " + window.scrollY);
+    
+    let hash = '#' + event.oldURL.split('#').pop();
+
+    if (y <= 0) {
+        hist[hash] = 1;
+    } else if (y >= window.scrollMaxY) {
+        hist[hash] = window.scrollMaxY - 1;
+    } else {
+        hist[hash] = y;
+    }
+
+    // for (let key in hist) {
+    //     console.log(key + ', ' + hist[key]);
+    // }
+
+    onLoadEvent();
+}
+
+function onPopStateEvent() {
+    console.log("onpopstate: " + document.location.hash + ", " + window.scrollY);
+    y = window.scrollY;
 }
 
 function showArticle(hash) {
@@ -63,13 +72,14 @@ function showHome() {
 function showContent(html) {
     try {
         document.getElementById('content').innerHTML = html;
-
+        // $('#content').html(html);
+        
         let hash = document.location.hash;
 
         if (hash in hist) {
             window.scrollTo(0, hist[hash]);
         } else {
-            window.scrollTo(0, 0);
+            window.scrollTo(0, 1);
         }
     } catch (e) {
         showCriticalError();
