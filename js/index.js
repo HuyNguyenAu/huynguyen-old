@@ -8,7 +8,6 @@ function onHashChangeEvent(event) {
 function onLoadEvent() {
     // Clear out any existing content.
     document.getElementById('content').innerHTML = '';
-    console.log(document.location.hash);
 
     switch (document.location.hash) {
         case '':
@@ -18,22 +17,15 @@ function onLoadEvent() {
             showHome();
             break;
         default:
-            showArticle('https://raw.githubusercontent.com/HuyNguyenAu/huynguyen/master/html/' + document.location.hash.replace('#', '') + '.html');
+            showContent('https://raw.githubusercontent.com/HuyNguyenAu/huynguyen/master/html/' + document.location.hash.replace('#', '') + '.html');
             break;
     }
 }
 
-function getArticles() {
-    return get('https://raw.githubusercontent.com/HuyNguyenAu/huynguyen/master/json/articles.json');
-}
-
 function showError(error) {
-    document.location.hash = '#error';
-    showArticle('https://raw.githubusercontent.com/HuyNguyenAu/huynguyen/master/html/error.html');
-    let articleBody = temp.querySelectorAll('.article-body');
-    let errorMessage = document.createElement('p');
-    errorMessage.appendChild(document.createTextNode(error));
-    articleBody.appendChild(errorMessage);
+    showContent('https://raw.githubusercontent.com/HuyNguyenAu/huynguyen/master/html/error.html', function () {
+        document.querySelector('.article-body').innerHTML += "<p>" + error + "<p>";
+    });
 }
 
 function showHome() {
@@ -46,10 +38,17 @@ function showHome() {
     });
 }
 
-function showArticle(url) {
-    get(url, function (html, _) {
-        document.getElementById('content').innerHTML = html;
-    })
+function showContent(url, callback) {
+    get(
+        url,
+        function (html, _) {
+            document.getElementById('content').innerHTML = html;
+
+            if (typeof (callback) === 'function') {
+                callback();
+            }
+        }
+    );
 }
 
 async function get(url, callback) {
@@ -58,13 +57,17 @@ async function get(url, callback) {
             if (response.ok) {
                 return response.text();
             } else {
-                showError();
-                throw new Error('Failed to load ' + url);
+                throw new Error(response.status + '. Failed to load ' + url);
             }
         })
-        .then((content) => callback(content, url))
-        .catch((error) => {
-            console.log(error);
+        .then((content) => {
+            if (typeof (callback) === 'function') {
+                callback(content, url);
+            }
+        })
+        .catch((e) => {
+            showError(e);
+            console.warn(e);
         });
 }
 
