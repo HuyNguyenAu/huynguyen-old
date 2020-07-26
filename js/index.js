@@ -8,13 +8,19 @@ let y = 0;
 window.addEventListener('load', onLoadEvent);
 window.addEventListener('hashchange', onHashChangeEvent);
 window.onpopstate = function() {
+    console.log("onpopstate: " + document.location.hash + ", " + window.scrollY);
     y = window.scrollY;
   };
 
 function onHashChangeEvent(event) {
+    console.log("onHashChangeEvent: " + '#' + event.oldURL.split('#').pop() + ", " + '#' + event.newURL.split('#').pop() + ", " + window.scrollY);
     
     let hash = '#' + event.oldURL.split('#').pop();
     hist[hash] = y;
+
+    // for (let key in hist) {
+    //     console.log(key + ', ' + hist[key]);
+    // }
 
     onLoadEvent();
 }
@@ -61,17 +67,9 @@ function showContent(html) {
         let hash = document.location.hash;
 
         if (hash in hist) {
-            window.scrollTo({
-                top: hist[hash],
-                left: 0,
-                behavior: 'smooth'
-              });
+            window.scrollTo(0, hist[hash]);
         } else {
-            window.scrollTo({
-                top: 0,
-                left: 0,
-                behavior: 'smooth'
-              });
+            window.scrollTo(0, 0);
         }
     } catch (e) {
         showCriticalError();
