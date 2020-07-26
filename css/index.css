@@ -15,6 +15,7 @@ body {
 }
 
 .menu > a {
+    color: #222;
     margin-right: 1em;
     display: inline-block;
 }
