@@ -33,6 +33,10 @@ body {
     margin-bottom: 3em;
 }
 
+.article-header > a {
+    color: #222;
+}
+
 .article-title {
     font-size: 2em;
     color: #222;
