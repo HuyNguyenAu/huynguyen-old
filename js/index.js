@@ -88,8 +88,8 @@ function scrollToY(hash, hashHistory) {
         throw new Error('The parameter hash in the function scrollToY is undefined or not a string.');
     }
 
-    if (typeof (url) !== 'object') {
-        throw new Error('The parameter url in the function scrollToY is undefined or not a object.');
+    if (typeof (hashHistory) !== 'object') {
+        throw new Error('The parameter hashHistory in the function scrollToY is undefined or not a object.');
     }
 
     /* If the hash is found, then scroll to the y value last known, else just scroll to the top. */
