@@ -2,13 +2,6 @@ from os import listdir, path
 from sys import argv
 from bs4 import BeautifulSoup
 
-if len(argv) != 2:
-    exit()
-
-working_dir = argv[1]
-required_dirs = ["html", "css", "img"]
-required_files = ["base.html", "index.css", "ignore.txt"]
-
 class Article:
     def __init__(self, title, author, date, category, url, html):
         self.title = title
@@ -18,6 +11,7 @@ class Article:
         self.url = url
         self.html = html
 
+
 def getLocalPath(item):
     local_path = item
 
@@ -26,21 +20,25 @@ def getLocalPath(item):
 
     return local_path
 
+
 def getAbsolutePath(working_dir, item):
     return "{}\\{}".format(working_dir, getLocalPath(item))
+
 
 def searchPath(working_dir, items):
     for item in items:
         absolute_path = getAbsolutePath(working_dir, item)
 
-        if path.exists(absolute_path):
-            print("Found {}".format(absolute_path))
-        else:
+        if not path.exists(absolute_path):
             print("Unable to find {}".format(absolute_path))
-            exit()      
+            exit()
 
-def createHTML(item):
-    return BeautifulSoup(open(getAbsolutePath(working_dir, item)).read(), features="html.parser")
+
+def createHTML(working_dir, item):
+    return BeautifulSoup(
+        open(getAbsolutePath(working_dir, item)).read(), features="html.parser"
+    )
+
 
 def parseArticles(working_dir):
     articles = []
@@ -48,24 +46,35 @@ def parseArticles(working_dir):
 
     for item in listdir(getAbsolutePath(working_dir, "html")):
         if item not in ignore:
-            article = createHTML(item)
-            title = article.find("h2", {"class": "article-title"})
-            author = article.find("a", {"class": "article-author"})
-            date = article.find("span", {"class": "article-date"})
-            category = article.find("a", {"class": "article-category"})
-            url = article.find("div", {"class": "article"})
-            content = article.find("div", {"class": "article"})
+            article = createHTML(working_dir, item)
+            articles.append(
+                Article(
+                    article.find("h2", {"class": "article-title"}),
+                    article.find("a", {"class": "article-author"}),
+                    article.find("span", {"class": "article-date"}),
+                    article.find("a", {"class": "article-category"}),
+                    getLocalPath(item),
+                    article.find("div", {"class": "article"}),
+                )
+            )
 
-            articles.append(title, author, date, category, url, content)
+def main():
+    if len(argv) != 2:
+        exit()
 
-            print(date)
+    working_dir = argv[1]
+    required_dirs = ["html", "css", "img"]
+    required_files = ["base.html", "index.css", "ignore.txt"]
 
-# Search for required directories.
-searchPath(working_dir, required_dirs)
-# Search for required files.
-searchPath(working_dir, required_files)
+    # Search for required directories.
+    searchPath(working_dir, required_dirs)
+    # Search for required files.
+    searchPath(working_dir, required_files)
+    # Parse articles and build a list of articles with required meta data.
+    parseArticles(working_dir)
 
-# parseArticles(working_dir)
+if __name__ == "__main__":
+    main()
 
 # articles = ""
 
