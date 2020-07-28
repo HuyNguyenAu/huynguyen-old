@@ -2,6 +2,7 @@ from os import listdir, path
 from sys import argv
 from bs4 import BeautifulSoup
 from datetime import datetime
+from json import dumps
 
 class Article:
     def __init__(self, title, author, date, category, url, html):
@@ -91,7 +92,14 @@ def buildIndex(working_dir, base, articles, limit):
 
     return index
 
-# def buildJSON(working_dir, articles):
+def obj_dict(obj):
+    return obj.__dict__
+
+def buildJSON(articles):
+    for article in articles:
+        del article.html
+
+    return dumps(articles, default=obj_dict)
 
 
 def writeFile(working_dir, fileName, contents):
@@ -113,7 +121,7 @@ def main():
     searchPath(working_dir, required_files)
     # Parse articles and build a list of articles with required meta data.
     articles = parseArticles(working_dir)
-
+    writeFile(working_dir, getLocalPath("articles.json"), buildJSON(articles))
     # items = buildContent(articles)
     # index = buildIndex(working_dir, "base.html", items, 10).prettify()
 
