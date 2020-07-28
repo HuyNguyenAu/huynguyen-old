@@ -54,7 +54,7 @@ def parseArticles(working_dir):
                     article.find("a", {"class": "article-author"}).string,
                     article.find("span", {"class": "article-date"}).string,
                     article.find("a", {"class": "article-category"}).string,
-                    getLocalPath(item),
+                    "https://raw.githubusercontent.com/HuyNguyenAu/huynguyen/master/{}".format(getLocalPath(item).replace("\\", "/")),
                     article,
                 )
             )
@@ -91,6 +91,14 @@ def buildIndex(working_dir, base, articles, limit):
 
     return index
 
+# def buildJSON(working_dir, articles):
+
+
+def writeFile(working_dir, fileName, contents):
+    writer = open("{}\\{}".format(working_dir, fileName), "w")
+    writer.write(contents)
+    writer.close()
+
 def main():
     if len(argv) != 2:
         exit()
@@ -105,12 +113,9 @@ def main():
     searchPath(working_dir, required_files)
     # Parse articles and build a list of articles with required meta data.
     articles = parseArticles(working_dir)
-    items = buildContent(articles)
-    index = buildIndex(working_dir, "base.html", items, 10).prettify()
 
-    index_file = open("{}\\index.html".format(working_dir), "w")
-    index_file.write(index)
-    index_file.close()
+    # items = buildContent(articles)
+    # index = buildIndex(working_dir, "base.html", items, 10).prettify()
 
 if __name__ == "__main__":
     main()
