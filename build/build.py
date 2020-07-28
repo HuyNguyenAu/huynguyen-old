@@ -1,6 +1,7 @@
 from os import listdir, path
 from sys import argv
 from bs4 import BeautifulSoup
+from datetime import datetime
 
 class Article:
     def __init__(self, title, author, date, category, url, html):
@@ -34,7 +35,7 @@ def searchPath(working_dir, items):
             exit()
 
 
-def createHTML(working_dir, item):
+def createHTMLFromDir(working_dir, item):
     return BeautifulSoup(
         open(getAbsolutePath(working_dir, item)).read(), features="html.parser"
     )
@@ -46,17 +47,46 @@ def parseArticles(working_dir):
 
     for item in listdir(getAbsolutePath(working_dir, "html")):
         if item not in ignore:
-            article = createHTML(working_dir, item)
+            article = createHTMLFromDir(working_dir, item)
             articles.append(
                 Article(
-                    article.find("h2", {"class": "article-title"}),
-                    article.find("a", {"class": "article-author"}),
-                    article.find("span", {"class": "article-date"}),
-                    article.find("a", {"class": "article-category"}),
+                    article.find("h2", {"class": "article-title"}).string,
+                    article.find("a", {"class": "article-author"}).string,
+                    article.find("span", {"class": "article-date"}).string,
+                    article.find("a", {"class": "article-category"}).string,
                     getLocalPath(item),
-                    article.find("div", {"class": "article"}),
+                    article,
                 )
             )
+
+    return sorted(articles, key=lambda x: datetime.strptime(x.date, "%d/%m/%Y"), reverse=True)
+
+def buildContent(items):
+    articles = []
+
+    for article in items:
+        newLink = article.html.new_tag('a')
+        newLink["href"] = article.url
+        article.html.find("h2", {"class": "article-title"}).wrap(newLink)
+        
+        paragraphs = article.html.find("div", {"class": "article-body"}).findAll("p")
+        for i in range(0, len(paragraphs)):
+            if i == 0:
+                paragraphs[i]["class"] = "truncate"
+            else:
+                paragraphs[i].decompose()
+
+        articles.append(article)
+
+    return articles
+
+def buildIndex(working_dir, base, articles, limit):
+    index = createHTMLFromDir(working_dir, base)
+
+    for i in range(limit):
+        index.find("div", {"id": "content"}).append(articles[i].html.find("div", {"class": "article"}))
+
+    return index
 
 def main():
     if len(argv) != 2:
@@ -71,33 +101,13 @@ def main():
     # Search for required files.
     searchPath(working_dir, required_files)
     # Parse articles and build a list of articles with required meta data.
-    parseArticles(working_dir)
+    articles = parseArticles(working_dir)
+    items = buildContent(articles)
+    index = buildIndex(working_dir, "base.html", items, 5).prettify()
+
+    index_file = open("{}\\index.html".format(working_dir), "w")
+    index_file.write(index)
+    index_file.close()
 
 if __name__ == "__main__":
     main()
-
-# articles = ""
-
-# for file in listdir(working_dir + "\\html"):
-#     if file not in ignore:
-#         print(file)
-
-# for file in listdir(working_dir + "\\html"):
-#     if file not in ignore:
-#         print(file)
-#         article = BeautifulSoup(open(working_dir + "\\html\\" + file).read(), features="html.parser")
-
-#         newLink = article.new_tag('a')
-#         newLink["href"] = "html\\" + file
-#         article.find("h2", {"class": "article-title"}).wrap(newLink)
-
-#         articleBodyParagraphs = article.find("div", {"class": "article-body"}).findAll("p")
-
-#         for i in range(1, len(articleBodyParagraphs)):
-#             articleBodyParagraphs[i].decompose()
-
-#         content.find("div", {"id": "content"}).append(article.find("div", {"class": "article"}))
-
-# f = open(working_dir + "\\index.html", "w")
-# f.write(content.prettify())
-# f.close()
