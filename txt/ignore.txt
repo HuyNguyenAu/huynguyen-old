@@ -1,3 +1,3 @@
-base_index.html
+base.html
 error.html
 critical.html

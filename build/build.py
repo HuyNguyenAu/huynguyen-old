@@ -83,6 +83,8 @@ def buildContent(items):
 def buildIndex(working_dir, base, articles, limit):
     index = createHTMLFromDir(working_dir, base)
 
+    index
+
     for i in range(limit):
         index.find("div", {"id": "content"}).append(articles[i].html.find("div", {"class": "article"}))
 
@@ -103,7 +105,7 @@ def main():
     # Parse articles and build a list of articles with required meta data.
     articles = parseArticles(working_dir)
     items = buildContent(articles)
-    index = buildIndex(working_dir, "base.html", items, 5).prettify()
+    index = buildIndex(working_dir, "base.html", items, 10).prettify()
 
     index_file = open("{}\\index.html".format(working_dir), "w")
     index_file.write(index)
