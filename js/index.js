@@ -4,6 +4,7 @@
 
 let hist = [];
 let y = 0;
+const limit = 10;
 
 window.addEventListener('load', onLoadEvent);
 window.addEventListener('hashchange', onHashChangeEvent);
@@ -48,7 +49,7 @@ function showArticle(hash) {
 function showError(error) {
     get('https://raw.githubusercontent.com/HuyNguyenAu/huynguyen/master/html/error.html')
         .then((html) => showContent(html))
-        .then(() => document.querySelector('.article-body').innerHTML += `<p>${error}<p>`);
+        .then(() => document.querySelector('.article-body').innerHTML += `<p>${error}<p>`).catch(() => showCriticalErrorPage());
 }
 
 function showHome() {
@@ -56,23 +57,54 @@ function showHome() {
         .then((json) => {
             let jobs = [];
 
-            document.getElementById('content').innerHTML = '';
-            JSON.parse(json).articles.forEach(article => jobs.push(get(article.url)
-                .then((html) => { console.log(typeof (html), typeof (article.url)); return createHomeItem(html, article.url); }
-                )));
+            showContent('');
 
-            Promise.all(jobs).then((content) => showContent(content.join('')));
+            JSON.parse(json).articles.slice(0, limit).forEach(article => jobs.push(get(article.url)
+                .then((html) => createHomeItem(html, article.url))
+                .then((article) => appendContent(article))));
+
+            Promise.all(jobs).then(() => scrollToY(document.location.hash, hist));
         });
 }
 
-function showContent(html) {
-    try {
-        document.getElementById('content').innerHTML = html;
+function appendContent(html) {
+    /* Check the parameter. */
+    if (typeof (html) !== 'string') {
+        throw new Error('The parameter html in the function appendContent is undefined or not a string.');
+    }
 
-        scrollToY(document.location.hash, hist);
-    } catch (e) {
+    try {
+        let content = document.getElementById('content');
+        if (content) {
+            content.insertAdjacentHTML("afterbegin", html);
+        } else {
+            throw new Error("Unable to find an element with the id content!");
+        }
+
+    } catch (error) {
         showCriticalErrorPage();
-        console.error(e);
+        console.error(error);
+    }
+}
+
+function showContent(html) {
+    /* Check the parameter. */
+    if (typeof (html) !== 'string') {
+        throw new Error('The parameter html in the function showContent is undefined or not a string.');
+    }
+
+    try {
+        let content = document.getElementById('content');
+        if (!content) {
+            throw new Error("Unable to find an element with the id content!");
+        }
+
+        content.innerHTML = html;
+        scrollToY(document.location.hash, hist);
+
+    } catch (error) {
+        showCriticalErrorPage();
+        console.error(error);
     }
 }
 
@@ -118,6 +150,10 @@ function get(url) {
         .then((response) => {
             /* Make sure we only return when we get a successful response (status 200-299). */
             if (response.ok) {
+                if (response.text().length <= 0) {
+                    throw new Error(`No content found in ${url}.`);
+                }
+
                 return response.text();
             } else {
                 throw new Error(`Failed to load ${url}.`);
@@ -154,10 +190,20 @@ function createHomeItem(html, url) {
 
         /* Wrap the header in a link so it give the visual feedback of a link. */
         let title = temp.querySelector('.article-title');
+
+        if (!title) {
+            throw new Error(`No title found in ${url}.`);
+        }
+
         title.outerHTML = `<a class="article-title-link" href="#${url.split('/').pop().replace('.html', '')}">${title.outerHTML}</a>`;
 
         /* Transform the article into an item by removing all but the first paragraph. */
         let paragraphs = temp.querySelectorAll('.article-body p');
+
+        if (!paragraphs) {
+            throw new Error(`No paragraphs found in ${url}.`);
+        }
+
         for (let i = 0; i < paragraphs.length; i++) {
             if (i === 0) {
                 paragraphs[i].classList.add('truncate');
