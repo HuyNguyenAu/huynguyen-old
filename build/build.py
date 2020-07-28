@@ -83,10 +83,11 @@ def buildContent(items):
 def buildIndex(working_dir, base, articles, limit):
     index = createHTMLFromDir(working_dir, base)
 
-    index
-
-    for i in range(limit):
-        index.find("div", {"id": "content"}).append(articles[i].html.find("div", {"class": "article"}))
+    for i in range(len(articles)):
+        if i < limit:
+            index.find("div", {"id": "content"}).append(articles[i].html.find("div", {"class": "article"}))
+        else:
+            break
 
     return index
 
