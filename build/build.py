@@ -138,11 +138,11 @@ def main():
     searchPath(working_dir, required_files)
     # Parse articles and build a list of articles with required meta data.
     articles = parseArticles(working_dir)
+    truncatedArticles = buildContent(articles)
     # Create the archive.html.
-    writeFile(working_dir, getLocalPath("archives.html"), "".join(buildArchives(articles)))
+    writeFile(working_dir, getLocalPath("archives.html"), "".join(buildArchives(truncatedArticles)))
     # Create the articles.json.
     writeFile(working_dir, getLocalPath("articles.json"), buildJSON(articles))
-    # items = buildContent(articles)
     # index = buildIndex(working_dir, "base.html", items, 10).prettify()
 
 if __name__ == "__main__":
