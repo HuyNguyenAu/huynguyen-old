@@ -4,6 +4,7 @@ html {
 
 a {
     text-decoration: none;
+    color: rgb(61, 146, 201);
 }
 
 a:hover {
@@ -18,26 +19,27 @@ body {
     font-family: sans-serif;
 }
 
-.menu > a {
+.menu>a {
     color: #222;
     margin-right: 1em;
     display: inline-block;
 }
 
-.menu > p {
+.menu>p {
     color: #222;
     display: inline-block;
 }
 
 .container {
-    margin: 1.5em 6em;
+    margin: auto;
+    width: 85%;
 }
 
 .article {
     margin-bottom: 4.5em;
 }
 
-.article-header > a {
+.article-header>a {
     color: #222;
 }
 
@@ -57,16 +59,16 @@ body {
     margin-top: 0em;
 }
 
-.article-subtitle > a {
+.article-date {
     color: rgb(61, 146, 201);
 }
 
-.article-subtitle > .article-category {
+.article-subtitle>.article-category {
     background: #8156a7;
     /* Set font size as a percentage relative to the
     parent's font size. */
     font-size: 80%;
-    /* Padding vertical and horizontal. */ 
+    /* Padding vertical and horizontal. */
     padding: 0.3em 1em;
     color: #fff;
 }
@@ -78,7 +80,7 @@ body {
     line-height: 1.8em;
 }
 
-.article-body > img {
+.article-body>img {
     /* Restrict the max width of the parent block.
     Makes sure the image does not exceed the width of the parent block. */
     max-width: 100%;
@@ -100,6 +102,7 @@ body {
     text-align: center;
     display: block;
     cursor: pointer;
+    margin-bottom: 1.5em;
 }
 
 .truncate {
