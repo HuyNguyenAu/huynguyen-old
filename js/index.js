@@ -12,6 +12,7 @@ reports the wrong vertical scrolling positon. */
 let lastVerticalScrollPosition = 0;
 /* The number of articles to load on the home page. */
 const limit = 10;
+const url = 'https://raw.githubusercontent.com/HuyNguyenAu/huynguyen/master/json/articles.json';
 
 window.addEventListener('load', onLoadEvent);
 window.addEventListener('hashchange', onHashChangeEvent);
@@ -25,9 +26,7 @@ function onLoadEvent() {
     if (!document.location.hash) {
         document.location.hash = '#home';
     } else if (document.location.hash === '#home') {
-        showHome();
-    } else if (document.location.hash === '#archives') {
-        showHome();
+        showHome(url);
     } else {
         showArticle(document.location.hash);
     }
@@ -91,11 +90,11 @@ function showError(error) {
 }
 
 /** Show home. */
-function showHome() {
-    get('https://raw.githubusercontent.com/HuyNguyenAu/huynguyen/master/json/articles.json')
+function showHome(url) {
+    get(url)
         .then((json) =>
             /* Only scroll to the last known y position when everything has been appended. */
-            Promise.all(parseArticles(json)).then(() => scrollToY(document.location.hash, verticalScrollHistory)));
+            Promise.all(parseArticles(json), false).then(() => scrollToY(document.location.hash, verticalScrollHistory)));
 }
 
 /** Parse the articles.json file and display it in content. Return a list of jobs. 
@@ -117,7 +116,10 @@ function parseArticles(json) {
 
     try {
         JSON.parse(json).slice(0, limit).forEach(article => jobs.push(get(article.url)
-            .then((html) => createHomeItem(html, article.url))
+            .then((html) => {
+                console.log(article.date);
+                return createHomeItem(html, article.url);
+            })
             .then((article) => showContent(article, true))));
     } catch (error) {
         /* An error here can still be displayed. */
