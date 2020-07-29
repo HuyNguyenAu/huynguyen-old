@@ -89,6 +89,12 @@ body {
     margin-top: 1em;
 }
 
+.archive-date {
+    font-size: 3em;
+    color: #222;
+    margin-bottom: 0.2em;
+}
+
 #go-to-top {
     width: 100%;
     text-align: center;
