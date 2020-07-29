@@ -16,6 +16,7 @@ const limit = 10;
 window.addEventListener('load', onLoadEvent);
 window.addEventListener('hashchange', onHashChangeEvent);
 window.addEventListener('popstate', onPopStateEvent);
+document.getElementById('go-to-top').addEventListener('click', onGoToTopClicked);
 
 /** This is called everytime the page is loaded and when the hash changes.
  * If the user is on the root page, then redirect the the home page.
@@ -115,7 +116,7 @@ function parseArticles(json) {
     let jobs = [];
 
     try {
-        JSON.parse(json).articles.slice(0, limit).forEach(article => jobs.push(get(article.url)
+        JSON.parse(json).slice(0, limit).forEach(article => jobs.push(get(article.url)
             .then((html) => createHomeItem(html, article.url))
             .then((article) => showContent(article, true))));
     } catch (error) {
@@ -285,5 +286,9 @@ function showCriticalErrorPage() {
     This means that the element used to show the content cannot be
     found. */
     window.location.href = 'html/critical.html';
+}
+
+function onGoToTopClicked() {
+    window.scrollTo(0, 1);
 }
 // } ());

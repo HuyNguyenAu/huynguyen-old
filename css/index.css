@@ -89,9 +89,16 @@ body {
     margin-top: 1em;
 }
 
+#go-to-top {
+    width: 100%;
+    text-align: center;
+    display: block;
+    cursor: pointer;
+}
+
 .truncate {
     width: 100%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-  }
+}
