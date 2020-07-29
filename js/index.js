@@ -2,7 +2,7 @@
 /* jshint browser: true */
 /*jslint devel: true */
 
-// (function () {
+(function () {
 /* A dictionary that consists of the url(key), and the
 vertical scrol position (value). */
 let verticalScrollHistory = [];
@@ -116,10 +116,7 @@ function parseArticles(json) {
 
     try {
         JSON.parse(json).slice(0, limit).forEach(article => jobs.push(get(article.url)
-            .then((html) => {
-                console.log(article.date);
-                return createHomeItem(html, article.url);
-            })
+            .then((html) => createHomeItem(html, article.url))
             .then((article) => showContent(article, true))));
     } catch (error) {
         /* An error here can still be displayed. */
@@ -293,4 +290,4 @@ function showCriticalErrorPage() {
 function onGoToTopClicked() {
     window.scrollTo(0, 1);
 }
-// } ());
+} ());
