@@ -1,3 +1,5 @@
 base.html
+article.html
+archives.html
 error.html
 critical.html

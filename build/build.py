@@ -5,9 +5,8 @@ from datetime import datetime
 from json import dumps
 
 class Article:
-    def __init__(self, title, author, date, category, url, html):
+    def __init__(self, title, date, category, url, html):
         self.title = title
-        self.author = author
         self.date = date
         self.category = category
         self.url = url
@@ -51,8 +50,7 @@ def parseArticles(working_dir):
             articles.append(
                 Article(
                     article.find("h2", {"class": "article-title"}).string,
-                    article.find("a", {"class": "article-author"}).string,
-                    article.find("span", {"class": "article-date"}).string,
+                    article.find("a", {"class": "article-date"}).string,
                     article.find("a", {"class": "article-category"}).string,
                     "https://raw.githubusercontent.com/HuyNguyenAu/huynguyen/master/{}".format(getLocalPath(item).replace("\\", "/")),
                     article,
