@@ -3,6 +3,7 @@ from sys import argv
 from bs4 import BeautifulSoup
 from datetime import datetime
 from json import dumps
+from calendar import month_name
 
 class Article:
     def __init__(self, title, date, category, url, html):
@@ -78,16 +79,36 @@ def buildContent(items):
 
     return articles
 
-def buildIndex(working_dir, base, articles, limit):
+def buildIndex(working_dir, base, items, limit):
     index = createHTMLFromDir(working_dir, base)
 
-    for i in range(len(articles)):
+    for i in range(len(items)):
         if i < limit:
-            index.find("div", {"id": "content"}).append(articles[i].html.find("div", {"class": "article"}))
+            index.find("div", {"id": "content"}).append(items[i].html.find("div", {"class": "article"}))
         else:
             break
 
     return index
+
+def buildArchives(articles):
+    content = []
+    lastMonthYear = ""
+
+    for article in articles:
+        date = article.date.split("/")
+        monthYear = "{} {}".format(month_name[int(date[1])], date.pop())
+
+        # This assumes the list of articles are sorted. 
+        if lastMonthYear != monthYear:
+            lastMonthYear = monthYear
+            archiveDate = article.html.new_tag('h2')
+            archiveDate["class"] = "archive-date"
+            archiveDate.append(monthYear)
+            content.append(archiveDate.prettify())
+
+        content.append(article.html.prettify())
+    
+    return content
 
 def obj_dict(obj):
     return obj.__dict__
@@ -97,10 +118,6 @@ def buildJSON(articles):
         del article.html
 
     return dumps(articles, default=obj_dict)
-
-def buildArticles(articles):
-    
-    return ""
 
 def writeFile(working_dir, fileName, contents):
     writer = open("{}\\{}".format(working_dir, fileName), "w")
@@ -121,6 +138,8 @@ def main():
     searchPath(working_dir, required_files)
     # Parse articles and build a list of articles with required meta data.
     articles = parseArticles(working_dir)
+    # Create the archive.html.
+    writeFile(working_dir, getLocalPath("archives.html"), "".join(buildArchives(articles)))
     # Create the articles.json.
     writeFile(working_dir, getLocalPath("articles.json"), buildJSON(articles))
     # items = buildContent(articles)

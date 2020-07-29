@@ -27,7 +27,7 @@ function onLoadEvent() {
     } else if (document.location.hash === '#home') {
         showHome();
     } else if (document.location.hash === '#archives') {
-        // showHome();
+        showHome();
     } else {
         showArticle(document.location.hash);
     }
