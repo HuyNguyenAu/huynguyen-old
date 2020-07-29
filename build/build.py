@@ -51,8 +51,8 @@ def parseArticles(working_dir):
             articles.append(
                 Article(
                     article.find("h2", {"class": "article-title"}).string,
-                    article.find("a", {"class": "article-date"}).string,
-                    article.find("a", {"class": "article-category"}).string,
+                    article.find("span", {"class": "article-date"}).string,
+                    article.find("span", {"class": "article-category"}).string,
                     "https://raw.githubusercontent.com/HuyNguyenAu/huynguyen/master/{}".format(getLocalPath(item).replace("\\", "/")),
                     article,
                 )
