@@ -25,6 +25,8 @@ function onLoadEvent() {
         document.location.hash = '#home';
     } else if (document.location.hash === '#home') {
         showHome();
+    } else if (document.location.hash === '#archives') {
+        // showHome();
     } else {
         showArticle(document.location.hash);
     }
@@ -40,6 +42,9 @@ function onHashChangeEvent(event) {
 
     let hash = '#' + event.oldURL.split('#').pop();
 
+    /* There is a bug where if the vertical scroll position is at 0 or scrollMaxY,
+    the returned value is mostly scrollMaxY. To prevent this, we just need to set either at
+    1 or window.scrollMaxY - 1. */
     if (lastVerticalScrollPosition <= 0) {
         verticalScrollHistory[hash] = 1;
     } else if (lastVerticalScrollPosition >= window.scrollMaxY) {
@@ -104,10 +109,10 @@ function parseArticles(json) {
         throw new Error(`The parameter html in the function parseArticles is undefined or not a string. Expected string, got ${typeof (json)}.`);
     }
 
-    let jobs = [];
-
     /* Clear out existing content. */
     showContent('', false);
+
+    let jobs = [];
 
     try {
         JSON.parse(json).articles.slice(0, limit).forEach(article => jobs.push(get(article.url)

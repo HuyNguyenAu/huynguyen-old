@@ -41,7 +41,6 @@ def createHTMLFromDir(working_dir, item):
         open(getAbsolutePath(working_dir, item)).read(), features="html.parser"
     )
 
-
 def parseArticles(working_dir):
     articles = []
     ignore = open(getAbsolutePath(working_dir, "ignore.txt")).read().splitlines()
@@ -101,6 +100,9 @@ def buildJSON(articles):
 
     return dumps(articles, default=obj_dict)
 
+def buildArticles(articles):
+    
+    return ""
 
 def writeFile(working_dir, fileName, contents):
     writer = open("{}\\{}".format(working_dir, fileName), "w")
@@ -121,6 +123,7 @@ def main():
     searchPath(working_dir, required_files)
     # Parse articles and build a list of articles with required meta data.
     articles = parseArticles(working_dir)
+    # Create the articles.json.
     writeFile(working_dir, getLocalPath("articles.json"), buildJSON(articles))
     # items = buildContent(articles)
     # index = buildIndex(working_dir, "base.html", items, 10).prettify()
