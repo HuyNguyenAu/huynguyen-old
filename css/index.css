@@ -16,7 +16,7 @@ a:visited {
 }
 
 body {
-    font-family: sans-serif;
+    font-family: 'Roboto', sans-serif;
 }
 
 .menu>a {
@@ -74,7 +74,6 @@ body {
 }
 
 .article-body {
-    font-family: Georgia, "Cambria", serif;
     color: #444;
     /* Set the distance between the lines of text. */
     line-height: 1.8em;
