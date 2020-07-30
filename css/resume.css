@@ -1,0 +1,69 @@
+  .hello {
+      background-color: #cc6666;
+      width: 70px;
+      height: 30px;
+      line-height: 30px;
+      text-align: center;
+      position: relative;
+      color: #fff;
+  }
+
+  .left-border-red {
+      padding: 0em 0.25em 0em 0.25em;
+      border-left: 6px solid #cc6666;
+  }
+
+  .left-border-blue {
+      padding: 0em 0.25em 0em 0.25em;
+      border-left: 6px solid #6699cc;
+  }
+
+  .left-border-purple {
+      padding: 0em 0.25em 0em 0.25em;
+      border-left: 6px solid #6666cc;
+  }
+
+  .left-border-yellow {
+      padding: 0em 0.25em 0em 0.25em;
+      border-left: 6px solid #cccc66;
+  }
+
+  .c-sharp {
+      padding: 0em 0.25em 0em 0.25em;
+      border-left: 6px solid #00E778;
+  }
+
+  .sql {
+      padding: 0em 0.25em 0em 0.25em;
+      border-left: 6px solid #B8271F;
+  }
+
+  .js {
+      padding: 0em 0.25em 0em 0.25em;
+      border-left: 6px solid #FCD90A;
+  }
+
+  .bs {
+      padding: 0em 0.25em 0em 0.25em;
+      border-left: 6px solid #6D32B7;
+  }
+
+  .powershell {
+      padding: 0em 0.25em 0em 0.25em;
+      border-left: 6px solid #1D74BD;
+  }
+
+  .bash {
+      padding: 0em 0.25em 0em 0.25em;
+      border-left: 6px solid #434D5C;
+  }
+
+  .laravel {
+      padding: 0em 0.25em 0em 0.25em;
+      border-left: 6px solid #F46758;
+  }
+
+  .cpp {
+      padding: 0em 0.25em 0em 0.25em;
+      border-left: 6px solid #1D71C0;
+  }
