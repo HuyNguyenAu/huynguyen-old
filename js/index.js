@@ -13,10 +13,12 @@
     /* The number of articles to load on the home page. */
     const limit = 10;
     const url = 'https://raw.githubusercontent.com/HuyNguyenAu/huynguyen/master/json/articles.json';
+    let darkMode = false;
 
     window.addEventListener('load', onLoadEvent);
     window.addEventListener('hashchange', onHashChangeEvent);
     window.addEventListener('popstate', onPopStateEvent);
+    document.getElementById('theme').addEventListener('click', onGoThemeClicked);
     document.getElementById('go-to-top').addEventListener('click', onGoToTopClicked);
 
     /** This is called everytime the page is loaded and when the hash changes.
@@ -86,6 +88,7 @@
         /* If we cannot append the error reason to the body, it means the document is corrupted. */
         if (articleBody) {
             articleBody.innerHTML += `<p>${error}<p>`;
+            theme();
         } else {
             showCriticalErrorPage();
         }
@@ -96,7 +99,8 @@
         get(url)
             .then((json) =>
                 /* Only scroll to the last known y position when everything has been appended. */
-                Promise.all(parseArticles(json), false).then(() => scrollToY(document.location.hash, verticalScrollHistory)));
+                Promise.all(parseArticles(json), false).then(() => scrollToY(document.location.hash, verticalScrollHistory))
+                .then(() => theme()));
     }
 
     /** Parse the articles.json file and display it in content. Return a list of jobs. 
@@ -156,6 +160,8 @@
                 content.innerHTML = html;
                 scrollToY(document.location.hash, verticalScrollHistory);
             }
+
+            theme();
 
         } catch (error) {
             console.error(error);
@@ -291,6 +297,23 @@
 
     function onGoToTopClicked() {
         window.scrollTo(0, 1);
+    }
+
+    function onGoThemeClicked() {
+        darkMode = !darkMode;
+        theme();
+    }
+
+    function theme() {
+        document.querySelectorAll('body, h2, p').forEach(element => {
+            if (darkMode) {
+                element.classList.add("dark-mode");
+            } else {
+                element.classList.remove("dark-mode");
+            }
+        });
+
+        document.getElementById('theme').innerText = darkMode ? '[Light Mode]' : '[Dark Mode]';
     }
 
     /* Source: https://stackoverflow.com/questions/4068573/convert-string-to-pascal-case-aka-uppercamelcase-in-javascript */
