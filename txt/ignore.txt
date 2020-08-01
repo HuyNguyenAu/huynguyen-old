@@ -1,5 +1,6 @@
-base.html
-article.html
+about.html
 archives.html
-error.html
+article.html
+base.html
 critical.html
+error.html
