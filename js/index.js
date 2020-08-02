@@ -12,7 +12,6 @@
     let lastVerticalScrollPosition = 0;
     /* The number of articles to load on the home page. */
     const limit = 10;
-    const url = 'https://raw.githubusercontent.com/HuyNguyenAu/huynguyen/master/json/articles.json';
     let darkMode = false;
 
     window.addEventListener('load', onLoadEvent);
@@ -28,7 +27,7 @@
         if (!document.location.hash) {
             document.location.hash = '#home';
         } else if (document.location.hash === '#home') {
-            showHome(url);
+            showHome();
         } else {
             showArticle(document.location.hash);
         }
@@ -95,12 +94,16 @@
     }
 
     /** Show home. */
-    function showHome(url) {
+    function showHome() {
+        const url = 'https://raw.githubusercontent.com/HuyNguyenAu/huynguyen/master/json/articles.json';
+
         get(url)
             .then((json) =>
                 /* Only scroll to the last known y position when everything has been appended. */
-                Promise.all(parseArticles(json), false).then(() => scrollToY(document.location.hash, verticalScrollHistory))
-                .then(() => theme()));
+                Promise.all(parseArticles(json), false)
+                    .then(() => scrollToY(document.location.hash, verticalScrollHistory))
+                    .then(() => theme()));
+
     }
 
     /** Parse the articles.json file and display it in content. Return a list of jobs. 
@@ -119,11 +122,11 @@
         showContent('', false);
 
         let jobs = [];
-
         try {
-            JSON.parse(json).slice(0, limit).forEach(article => jobs.push(get(article.url)
-                .then((html) => createHomeItem(html, article.url))
-                .then((article) => showContent(article, true))));
+            JSON.parse(json).slice(0, limit).forEach(article =>
+                jobs.push(get(article.url)
+                    .then((html) => createHomeItem(html, article.url))
+                    .then((article) => showContent(article, true))));
         } catch (error) {
             /* An error here can still be displayed. */
             showError(error);
@@ -319,6 +322,6 @@
     /* Source: https://stackoverflow.com/questions/4068573/convert-string-to-pascal-case-aka-uppercamelcase-in-javascript */
     function toPascalCase(string) {
         return string.replace(/\w+/g,
-            function (w) { return w[0].toUpperCase() + w.slice(1).toLowerCase(); });
+            function (word) { return word[0].toUpperCase() + word.slice(1).toLowerCase(); });
     }
 }());
