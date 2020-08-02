@@ -102,7 +102,7 @@
                 /* Only scroll to the last known y position when everything has been appended. */
                 Promise.all(parseArticles(json), false)
                     .then(() => scrollToY(document.location.hash, verticalScrollHistory))
-                    .then(() => theme()));
+                    .then(() => setTheme()));
 
     }
 
@@ -164,7 +164,7 @@
                 scrollToY(document.location.hash, verticalScrollHistory);
             }
 
-            theme();
+            setTheme();
 
         } catch (error) {
             console.error(error);
