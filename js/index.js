@@ -87,7 +87,7 @@
         /* If we cannot append the error reason to the body, it means the document is corrupted. */
         if (articleBody) {
             articleBody.innerHTML += `<p>${error}<p>`;
-            theme();
+            setTheme();
         } else {
             showCriticalErrorPage();
         }
@@ -299,15 +299,18 @@
     }
 
     function onGoToTopClicked() {
+        /* There is a bug where if the vertical scroll position is at 0 or scrollMaxY,
+       the returned value is mostly scrollMaxY. To prevent this, we just need to set either at
+       1 or window.scrollMaxY - 1. */
         window.scrollTo(0, 1);
     }
 
     function onGoThemeClicked() {
         darkMode = !darkMode;
-        theme();
+        setTheme();
     }
 
-    function theme() {
+    function setTheme() {
         document.querySelectorAll('body, h2, p').forEach(element => {
             if (darkMode) {
                 element.classList.add("dark-mode");
