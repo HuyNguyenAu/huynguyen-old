@@ -5,104 +5,90 @@
 (function () {
     /* A dictionary that consists of the url(key), and the
     vertical scrol position (value). */
-    let verticalScrollHistory = [];
+    let verticalScrollPositionHistory = [];
     /* Remember the last known vertical scrolling postion
     using the popstate event because the hashchange event
     reports the wrong vertical scrolling positon. */
     let lastVerticalScrollPosition = 0;
     /* The number of articles to load on the home page. */
     const limit = 10;
-    let darkMode = false;
 
     window.addEventListener('load', onLoadEvent);
     window.addEventListener('hashchange', onHashChangeEvent);
     window.addEventListener('popstate', onPopStateEvent);
-    document.getElementById('theme').addEventListener('click', onGoThemeClicked);
     document.getElementById('go-to-top').addEventListener('click', onGoToTopClicked);
 
-    /** This is called everytime the page is loaded and when the hash changes.
-     * If the user is on the root page, then redirect the the home page.
-    */
     function onLoadEvent() {
-        if (!document.location.hash) {
+        const page = getPage(document.location.hash);
+
+        if (!page) {
             document.location.hash = '#home';
-        } else if (document.location.hash === '#home') {
+        } else if (page === 'home') {
             showHome();
         } else {
-            showArticle(document.location.hash);
+            showArticle(page);
         }
 
-        document.title = `${toPascalCase(document.location.hash.replace('#', '').replace('_', ' ').toUpperCase())} - Huy Nguyen`;
+        document.title = getTitle(document.location.hash);
     }
 
-    /** When the user clicks on a link, the hash changes. When the hash changes, remember the
-     * vertical scroll position of the current page before moving on to the next. If the user is at the
-     * limits of the vertical scroll positon, then set the scroll position before the limits.
-    */
     function onHashChangeEvent(event) {
-        // Debug.
-        // console.log("onHashChangeEvent: " + '#' + event.oldURL.split('#').pop() + ", " + '#' + event.newURL.split('#').pop() + ", " + window.scrollY);
-
-        let hash = '#' + event.oldURL.split('#').pop();
-
-        /* There is a bug where if the vertical scroll position is at 0 or scrollMaxY,
-        the returned value is mostly scrollMaxY. To prevent this, we just need to set either at
-        1 or window.scrollMaxY - 1. */
-        if (lastVerticalScrollPosition <= 0) {
-            verticalScrollHistory[hash] = 1;
-        } else if (lastVerticalScrollPosition >= window.scrollMaxY) {
-            verticalScrollHistory[hash] = window.scrollMaxY - 1;
-        } else {
-            verticalScrollHistory[hash] = lastVerticalScrollPosition;
-        }
-
+        rememberVerticalScrollPosition(getPage(event.oldURL));
         onLoadEvent();
     }
 
-    /** When the user navigates, remember the vertical scroll position. 
-     * If we the hashchange event, it reports the wrong vertical scroll postion when the user
-     * is close to the limits of the vertical scroll.
-     * Popstate is called before hashchange.
-    */
     function onPopStateEvent() {
-        // Debug.
-        // console.log("onpopstate: " + document.location.hash + ", " + window.scrollY);
+        /* When the user navigates, remember the vertical scroll position. 
+        If we the hashchange event, it reports the wrong vertical scroll postion when the user
+        is close to the limits of the vertical scroll.
+        Popstate is called before hashchange. */
         lastVerticalScrollPosition = window.scrollY;
     }
 
-    /** Show the article. */
-    function showArticle(hash) {
-        get(`https://raw.githubusercontent.com/HuyNguyenAu/huynguyen/master/html/${hash.replace('#', '')}.html`)
+    /** Show the article based on the given page name.
+    * 
+    * @param String page
+    */
+    function showArticle(page) {
+        if (typeof (page) !== 'string') {
+            throw new Error(`The parameter page in the function showArticle 
+            is undefined or not a string. Expected string, got ${typeof (page)}.`);
+        }
+
+        get(`https://raw.githubusercontent.com/HuyNguyenAu/huynguyen/master/html/${page}.html`)
             .then((html) => showContent(html, false));
     }
 
-    /** Show the error page with the error message. */
+    /** Show the error page with the given error message.
+    * 
+    * @param String error
+    */
     function showError(error) {
+        if (typeof (error) !== 'string') {
+            throw new Error(`The parameter error in the function showError 
+            is undefined or not a string. Expected string, got ${typeof (error)}.`);
+        }
+
         /* An error page should not rely on downloading a payload. If we use get, it will end up being an infinite loop. */
-        const html = '<div class="article"><div class="article-header"><h2 class="article-title">OOPS!</h2></div><div class="article-body"><p>Looks like something went wrong!</p><p>Don\'t worry here\'s the error:</p></div></div>';
-        showContent(html, false);
+        showContent(`<div class="article"><div class="article-header"><h2 class="article-title">
+        OOPS!</h2></div><div class="article-body"><p>Looks like something went wrong!</p><p>Don\'t 
+        worry here\'s the error:</p></div></div>`, false);
 
         let articleBody = document.querySelector('.article-body');
 
         /* If we cannot append the error reason to the body, it means the document is corrupted. */
         if (articleBody) {
             articleBody.innerHTML += `<p>${error}<p>`;
-            setTheme();
         } else {
             showCriticalErrorPage();
         }
     }
 
-    /** Show home. */
     function showHome() {
-        const url = 'https://raw.githubusercontent.com/HuyNguyenAu/huynguyen/master/json/articles.json';
-
-        get(url)
+        get('https://raw.githubusercontent.com/HuyNguyenAu/huynguyen/master/json/articles.json')
             .then((json) =>
-                /* Only scroll to the last known y position when everything has been appended. */
                 Promise.all(parseArticles(json), false)
-                    .then(() => scrollToY(document.location.hash, verticalScrollHistory))
-                    .then(() => setTheme()));
+                    .then(() => scrollToY(getPage(document.location.hash), verticalScrollPositionHistory)));
 
     }
 
@@ -113,9 +99,9 @@
      * @returns Promise[]
     */
     function parseArticles(json) {
-        /* Check the parameters. */
         if (typeof (json) !== 'string') {
-            throw new Error(`The parameter html in the function parseArticles is undefined or not a string. Expected string, got ${typeof (json)}.`);
+            throw new Error(`The parameter json in the function parseArticles 
+            is undefined or not a string. Expected string, got ${typeof (json)}.`);
         }
 
         /* Clear out existing content. */
@@ -141,13 +127,14 @@
      * @param String html
     */
     function showContent(html, append) {
-        /* Check the parameters. */
         if (typeof (html) !== 'string') {
-            throw new Error(`The parameter html in the function showContent is undefined or not a string. Expected string, got ${typeof (html)}.`);
+            throw new Error(`The parameter html in the function showContent 
+            is undefined or not a string. Expected string, got ${typeof (html)}.`);
         }
 
         if (typeof (append) !== 'boolean') {
-            throw new Error(`The parameter append in the function showContent is undefined or not a boolean. Expected boolean, got ${typeof (append)}.`);
+            throw new Error(`The parameter append in the function showContent 
+            is undefined or not a boolean. Expected boolean, got ${typeof (append)}.`);
         }
 
         try {
@@ -161,16 +148,13 @@
                 content.insertAdjacentHTML("afterbegin", html);
             } else {
                 content.innerHTML = html;
-                scrollToY(document.location.hash, verticalScrollHistory);
+                scrollToY(getPage(document.location.hash), verticalScrollPositionHistory);
             }
-
-            setTheme();
-
         } catch (error) {
-            console.error(error);
             /* An error here means that the document html is has been corrupted.
             A standalone error page must be shown becuase the normal error relies on this
             method. */
+            console.error(error);
             showCriticalErrorPage();
         }
     }
@@ -178,30 +162,29 @@
     /** Scroll the the last known scroll y value given a hash and the hash history.
      * If hash is not in the hash history, then scroll to the top.
      * 
-     * @param String hash
-     * @param Array hashHistory
+     * @param String page
+     * @param Array history
     */
-    function scrollToY(hash, hashHistory) {
+    function scrollToY(page, history) {
+        if (typeof (page) !== 'string') {
+            throw new Error(`The parameter page in the function scrollToY 
+            is undefined or not a string. Expected string, got ${typeof (page)}.`);
+        }
+
+        if (typeof (history) !== 'object') {
+            throw new Error(`The parameter history in the function scrollToY 
+            is undefined or not a object. Expected object, got ${typeof (history)}.`);
+        }
+
         try {
-            /* Check the parameters. */
-            if (typeof (hash) !== 'string') {
-                throw new Error(`The parameter hash in the function scrollToY is undefined or not a string. Expected string, got ${typeof (hash)}.`);
-            }
-
-            if (typeof (hashHistory) !== 'object') {
-                throw new Error(`The parameter hashHistory in the function scrollToY is undefined or not a object. Expected object, got ${typeof (hashHistory)}.`);
-            }
-
-            /* If the hash is found, then scroll to the y value last known, else just scroll to the top. */
-            if (hash in hashHistory) {
-                window.scrollTo(0, hashHistory[hash]);
+            if (page in history) {
+                window.scrollTo(0, history[page]);
             } else {
                 /* There is a bug in chrome where scrolling to the top somehow causes it the window.scrollY to
                 be equal to window.scrollMaxY. This might be due to an overflow of some kind? */
                 window.scrollTo(0, 1);
             }
         } catch (error) {
-            /* An error here can still be displayed. */
             showError(error);
         }
     }
@@ -213,14 +196,13 @@
      * @returns String
     */
     function get(url) {
-        /* Check the parameter. */
         if (typeof (url) !== 'string') {
-            throw new Error(`The parameter url in the function get is undefined or not a string. Expected string, got ${typeof (url)}.`);
+            throw new Error(`The parameter url in the function get 
+            is undefined or not a string. Expected string, got ${typeof (url)}.`);
         }
 
         return fetch(url)
             .then((response) => {
-                /* Make sure we only return when we get a successful response (status 200-299). */
                 if (response.ok) {
                     return response.text();
                 } else {
@@ -228,7 +210,6 @@
                 }
             })
             .catch((error) => {
-                /* An error here can still be displayed. */
                 showError(error);
             });
     }
@@ -242,13 +223,14 @@
      * @returns String
     */
     function createHomeItem(html, url) {
-        /* Check the parameters. */
         if (typeof (html) !== 'string') {
-            throw new Error(`The parameter html in the function createHomeItem is undefined or not a string. Expected string, got ${typeof (html)}.`);
+            throw new Error(`The parameter html in the function createHomeItem 
+            is undefined or not a string. Expected string, got ${typeof (html)}.`);
         }
 
         if (typeof (url) !== 'string') {
-            throw new Error(`The parameter url in the function createHomeItem is undefined or not a string. Expected string, got ${typeof (url)}.`);
+            throw new Error(`The parameter url in the function createHomeItem 
+            is undefined or not a string. Expected string, got ${typeof (url)}.`);
         }
 
         try {
@@ -282,14 +264,10 @@
 
             return temp.innerHTML;
         } catch (error) {
-            /* An error here can still be displayed. */
             showError(error);
         }
     }
 
-    /** Show the standalone critical error page. This should only be used
-     * when the normal error page cannot be shown.
-    */
     function showCriticalErrorPage() {
         /* Show a standalone error page. This should only be used
         when we cannot show the normal error in the content element. 
@@ -305,26 +283,120 @@
         window.scrollTo(0, 1);
     }
 
-    function onGoThemeClicked() {
-        darkMode = !darkMode;
-        setTheme();
+    /** Store the vertical scroll postision.
+    * 
+    * @param String page
+    */
+    function rememberVerticalScrollPosition(page) {
+        if (typeof (page) !== 'string') {
+            throw new Error(`The parameter page in the function rememberVerticalScrollPosition 
+            is undefined or not a string. Expected string, got ${typeof (page)}.`);
+        }
+
+        verticalScrollPositionHistory[page] =
+            getVerticalScrollPosition(lastVerticalScrollPosition);
     }
 
-    function setTheme() {
-        document.querySelectorAll('body, h2, p').forEach(element => {
-            if (darkMode) {
-                element.classList.add("dark-mode");
-            } else {
-                element.classList.remove("dark-mode");
-            }
-        });
+    /** Return an adjusted vertical scroll postision value based on the
+    * given vertical scroll postision;
+    * 
+    * @param String page
+    * 
+    * @returns String
+    */
+    function getVerticalScrollPosition(lastVerticalScrollPosition) {
+        if (typeof (lastVerticalScrollPosition) !== 'number') {
+            throw new Error(`The parameter lastVerticalScrollPosition in the 
+            function getVerticalScrollPosition is undefined or not a number. 
+            Expected number, got ${typeof (lastVerticalScrollPosition)}.`);
+        }
 
-        document.getElementById('theme').innerText = darkMode ? '[Light Mode]' : '[Dark Mode]';
+        let verticalScrollPosition = 1;
+
+        /* There is a bug where if the vertical scroll position is at 0 or scrollMaxY,
+       the returned value is mostly scrollMaxY. To prevent this, we just need to set either at
+       1 or window.scrollMaxY - 1. */
+        if (lastVerticalScrollPosition <= 0) {
+            verticalScrollPosition = 1;
+        } else if (lastVerticalScrollPosition >= window.scrollMaxY) {
+            verticalScrollPosition = window.scrollMaxY - 1;
+        } else {
+            verticalScrollPosition = lastVerticalScrollPosition;
+        }
+
+        return verticalScrollPosition;
     }
 
-    /* Source: https://stackoverflow.com/questions/4068573/convert-string-to-pascal-case-aka-uppercamelcase-in-javascript */
+    /** Return the title string from a given page value.
+     * 
+     * @param String page
+     * 
+     * @returns String
+    */
+    function getTitle(page) {
+        if (typeof (page) !== 'string') {
+            throw new Error(`The parameter page in the function setTitle is 
+            undefined or not a string. Expected string, got ${typeof (page)}.`);
+        }
+
+        return `${toPascalCase(getPage(page).replace('_', ' '))} - Huy Nguyen`;
+    }
+
+    /** Convert a string to Pascal case.
+     * 
+     * @param String string
+     * 
+     * @returns String
+    */
     function toPascalCase(string) {
+        /* Source: https://stackoverflow.com/questions/4068573/convert-string-to-pascal-case-aka-uppercamelcase-in-javascript */
+        if (typeof (string) !== 'string') {
+            throw new Error(`The parameter string in the function toPascalCase 
+            is undefined or not a string. Expected string, got ${typeof (string)}.`);
+        }
+
         return string.replace(/\w+/g,
             function (word) { return word[0].toUpperCase() + word.slice(1).toLowerCase(); });
+    }
+
+    /** Return the page value from a given url.
+     * 
+     * @param String url
+     * 
+     * @returns String
+    */
+    function getPage(url) {
+        if (typeof (url) !== 'string') {
+            throw new Error(`The parameter url in the function getPage is 
+            undefined or not a string. Expected string, got ${typeof (url)}.`);
+        }
+
+        return url.split('#').pop().split('?')[0];
+    }
+
+    /** Return the theme value from a given url.
+     * 
+     * @param String url
+     * 
+     * @returns String
+    */
+    function getTheme(url) {
+        if (typeof (url) !== 'string') {
+            throw new Error(`The parameter url in the function getTheme is 
+            undefined or not a string. Expected string, got ${typeof (url)}.`);
+        }
+
+        const parameters = url.split('#').pop().split('?');
+        let value = '';
+
+        if (parameters.length === 2 && parameters[1].startsWith('theme=')) {
+            const theme = parameters[1].split('=').pop();
+
+            if (theme === 'light' || theme === 'dark') {
+                value = theme;
+            }
+        }
+
+        return value;
     }
 }());
