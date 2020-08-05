@@ -16,16 +16,26 @@
     window.addEventListener('load', onLoadEvent);
     window.addEventListener('hashchange', onHashChangeEvent);
     window.addEventListener('popstate', onPopStateEvent);
+    document.getElementById('theme').addEventListener('click', onThemeClicked);
     document.getElementById('go-to-top').addEventListener('click', onGoToTopClicked);
 
     function onLoadEvent() {
         const page = getPage(document.location.hash);
+        const theme = getTheme(document.location.search);
+
+        if (!theme) {
+            document.location.search = `theme=light`;
+        } else {
+            setThemeButtonText();
+        }
 
         if (!page) {
             document.location.hash = '#home';
-        } else if (page === 'home') {
+        }
+        else if (page === 'home') {
             showHome();
         } else {
+
             showArticle(page);
         }
 
@@ -56,7 +66,10 @@
         }
 
         get(`https://raw.githubusercontent.com/HuyNguyenAu/huynguyen/master/html/${page}.html`)
-            .then((html) => showContent(html, false));
+            .then((html) => {
+                showContent(html, false);
+                setTheme();
+            });
     }
 
     /** Show the error page with the given error message.
@@ -88,7 +101,10 @@
         get('https://raw.githubusercontent.com/HuyNguyenAu/huynguyen/master/json/articles.json')
             .then((json) =>
                 Promise.all(parseArticles(json), false)
-                    .then(() => scrollToY(getPage(document.location.hash), verticalScrollPositionHistory)));
+                    .then(() => {
+                        scrollToY(getPage(document.location.hash), verticalScrollPositionHistory);
+                        setTheme();
+                    }));
 
     }
 
@@ -112,7 +128,10 @@
             JSON.parse(json).slice(0, limit).forEach(article =>
                 jobs.push(get(article.url)
                     .then((html) => createHomeItem(html, article.url))
-                    .then((article) => showContent(article, true))));
+                    .then((article) => {
+                        showContent(article, true);
+                        setTheme();
+                    })));
         } catch (error) {
             /* An error here can still be displayed. */
             showError(error);
@@ -283,6 +302,17 @@
         window.scrollTo(0, 1);
     }
 
+    function onThemeClicked() {
+        const theme = getTheme(document.location.search);
+        let newTheme = 'theme=dark';
+
+        if (theme === 'dark') {
+            newTheme = 'theme=light';
+        }
+
+        document.location.search = newTheme;
+    }
+
     /** Store the vertical scroll postision.
     * 
     * @param String page
@@ -386,17 +416,41 @@
             undefined or not a string. Expected string, got ${typeof (url)}.`);
         }
 
-        const parameters = url.split('#').pop().split('?');
+        const theme = url.split('?').pop();
         let value = '';
 
-        if (parameters.length === 2 && parameters[1].startsWith('theme=')) {
-            const theme = parameters[1].split('=').pop();
+        if (theme.startsWith('theme=')) {
+            const themeValue = theme.split('=').pop();
 
-            if (theme === 'light' || theme === 'dark') {
-                value = theme;
+            if (themeValue === 'light' || themeValue === 'dark') {
+                value = themeValue;
             }
         }
 
         return value;
+    }
+
+    function setTheme() {
+        const elements = document.querySelectorAll('body, a, h2, p');
+        const theme = getTheme(document.location.search);
+
+        for (let i = 0; i < elements.length; i++) {
+            if (theme === 'light') {
+                elements[i].classList.remove("dark-mode");
+            } else {
+                elements[i].classList.add("dark-mode");
+            }
+        }
+    }
+
+    function setThemeButtonText() {
+        const theme = getTheme(document.location.search);
+        let themeText = '[Dark Mode]';
+
+        if (theme === 'dark') {
+            themeText = '[Light Mode]';
+        }
+
+        document.getElementById('theme').innerText = themeText;
     }
 }());
