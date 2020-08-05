@@ -60,16 +60,17 @@
     * @param String page
     */
     function showArticle(page) {
-        if (typeof (page) !== 'string') {
-            throw new Error(`The parameter page in the function showArticle 
+        try {
+            if (typeof (page) !== 'string') {
+                throw new Error(`The parameter page in the function showArticle 
             is undefined or not a string. Expected string, got ${typeof (page)}.`);
-        }
+            }
 
-        get(`https://raw.githubusercontent.com/HuyNguyenAu/huynguyen/master/html/${page}.html`)
-            .then((html) => {
-                showContent(html, false);
-                setTheme();
-            });
+            get(`https://raw.githubusercontent.com/HuyNguyenAu/huynguyen/master/html/${page}.html`)
+                .then((html) => showContent(html, false));
+        } catch (error) {
+            showError(error);
+        }
     }
 
     /** Show the error page with the given error message.
@@ -77,9 +78,9 @@
     * @param String error
     */
     function showError(error) {
-        if (typeof (error) !== 'string') {
+        if (typeof (error) !== 'string' && typeof (error) !== 'object') {
             throw new Error(`The parameter error in the function showError 
-            is undefined or not a string. Expected string, got ${typeof (error)}.`);
+            is undefined or not a string or object. Expected string or object, got ${typeof (error)}.`);
         }
 
         /* An error page should not rely on downloading a payload. If we use get, it will end up being an infinite loop. */
@@ -92,6 +93,7 @@
         /* If we cannot append the error reason to the body, it means the document is corrupted. */
         if (articleBody) {
             articleBody.innerHTML += `<p>${error}<p>`;
+            setTheme();
         } else {
             showCriticalErrorPage();
         }
@@ -128,10 +130,7 @@
             JSON.parse(json).slice(0, limit).forEach(article =>
                 jobs.push(get(article.url)
                     .then((html) => createHomeItem(html, article.url))
-                    .then((article) => {
-                        showContent(article, true);
-                        setTheme();
-                    })));
+                    .then((article) => showContent(article, true))));
         } catch (error) {
             /* An error here can still be displayed. */
             showError(error);
@@ -167,6 +166,7 @@
                 content.insertAdjacentHTML("afterbegin", html);
             } else {
                 content.innerHTML = html;
+                setTheme();
                 scrollToY(getPage(document.location.hash), verticalScrollPositionHistory);
             }
         } catch (error) {
