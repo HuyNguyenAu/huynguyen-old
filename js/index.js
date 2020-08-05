@@ -12,6 +12,8 @@
     let lastVerticalScrollPosition = 0;
     /* The number of articles to load on the home page. */
     const limit = 10;
+    let controller = new AbortController();
+    let signal = controller.signal;
 
     window.addEventListener('load', onLoadEvent);
     window.addEventListener('hashchange', onHashChangeEvent);
@@ -83,6 +85,11 @@
             is undefined or not a string or object. Expected string or object, got ${typeof (error)}.`);
         }
 
+        controller.abort();
+        /* Reset abort controller. */
+        controller = new AbortController();
+        signal = controller.signal;
+
         /* An error page should not rely on downloading a payload. If we use get, it will end up being an infinite loop. */
         showContent(`<div class="article"><div class="article-header"><h2 class="article-title">
         OOPS!</h2></div><div class="article-body"><p>Looks like something went wrong!</p><p>Don\'t 
@@ -106,7 +113,8 @@
                     .then(() => {
                         scrollToY(getPage(document.location.hash), verticalScrollPositionHistory);
                         setTheme();
-                    }));
+                    })
+            );
 
     }
 
@@ -220,7 +228,7 @@
             is undefined or not a string. Expected string, got ${typeof (url)}.`);
         }
 
-        return fetch(url)
+        return fetch(url, { signal })
             .then((response) => {
                 if (response.ok) {
                     return response.text();
@@ -229,6 +237,7 @@
                 }
             })
             .catch((error) => {
+                console.log(error);
                 showError(error);
             });
     }
@@ -288,6 +297,10 @@
     }
 
     function showCriticalErrorPage() {
+        controller.abort();
+        /* Reset abort controller. */
+        controller = new AbortController();
+        signal = controller.signal;
         /* Show a standalone error page. This should only be used
         when we cannot show the normal error in the content element. 
         This means that the element used to show the content cannot be
