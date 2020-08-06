@@ -3,6 +3,9 @@
 /*jslint devel: true */
 
 (function () {
+    /* Set the theme before the document loads to stop the page from
+    flashing white. */
+    setTheme();
     /* A dictionary that consists of the url(key), and the
     vertical scrol position (value). */
     let verticalScrollPositionHistory = [];
@@ -16,6 +19,7 @@
     let signal = controller.signal;
 
     window.addEventListener('load', onLoadEvent);
+    // document.addEventListener('DOMContentLoaded', onLoadEvent);
     window.addEventListener('hashchange', onHashChangeEvent);
     window.addEventListener('popstate', onPopStateEvent);
     document.getElementById('theme').addEventListener('click', onThemeClicked);
