@@ -49,6 +49,7 @@
     /** Only intialise the burger menu and go to top button once. */
     function onDOMContentLoaded() {
         initBurger();
+        initNavbarItems();
         initGoToTopButton();
     }
 
@@ -62,13 +63,30 @@
                 document.getElementById(e.currentTarget.dataset.target).classList.toggle('is-active');
             });
         } catch (e) {
-            error(`Failed to add click event listener to navbar-burger. ${e}.`);
+            error(`Failed to initialise navbar-burger. ${e}.`);
 
             try {
                 document.querySelector('.navbar-burger').remove();
             } catch (e) {
                 error(`Failed to remove navbar-burger. ${e}.`);
             }
+        }
+    }
+
+    /** When the user clicks on the logo or any of the navbar items, close
+     * the burger menu.
+      */
+    function initNavbarItems() {
+        try {
+            Array.from(document.getElementsByClassName('navbar-item')).forEach(item => {
+                item.addEventListener('click', function (e) {
+                    const burger = document.querySelector('.navbar-burger');
+                    burger.classList.remove('is-active');
+                    document.getElementById(burger.dataset.target).classList.remove('is-active');
+                });
+            });
+        } catch (e) {
+            error(`Failed to remove navbar-burger. ${e}.`);
         }
     }
 
@@ -84,7 +102,7 @@
                 window.scrollTo(0, 1);
             });
         } catch (e) {
-            error(`Failed to add click event listener to go-to-top button. ${e}.`);
+            error(`Failed to initialise go-to-top button. ${e}.`);
 
             try {
                 document.getElementById('go-to-top').remove();
@@ -103,7 +121,7 @@
                 });
             });
         } catch (e) {
-            error(`Failed to add click event listener to home items. ${e}.`);
+            error(`Failed to initialise home items. ${e}.`);
             errorCritical();
         }
     }
