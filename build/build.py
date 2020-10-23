@@ -73,6 +73,7 @@ def buildContent(items, url):
 
     for article in items:
         card = article.html.find("div", {"class": "card"})
+        card["class"].append("is-clickable")
         card["url"] = article.url
 
         paragraphs = article.html.find("div", {"class": "card-content"}).find("div", {"class": "content"}, recursive=False).findAll("p")
