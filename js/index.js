@@ -19,13 +19,15 @@
     let signal = controller.signal;
 
     window.addEventListener('load', onLoadEvent);
-    // document.addEventListener('DOMContentLoaded', onLoadEvent);
+    document.addEventListener('DOMContentLoaded', onLoadEvent);
     window.addEventListener('hashchange', onHashChangeEvent);
     window.addEventListener('popstate', onPopStateEvent);
-    document.getElementById('theme').addEventListener('click', onThemeClicked);
+    // document.getElementById('theme').addEventListener('click', onThemeClicked);
     document.getElementById('go-to-top').addEventListener('click', onGoToTopClicked);
 
     function onLoadEvent() {
+        initBurger();
+
         const page = getPage(document.location.hash);
         const theme = getTheme(document.location.search);
 
@@ -46,6 +48,15 @@
         }
 
         document.title = getTitle(document.location.hash);
+    }
+
+    function initBurger() {
+        Array.from(document.getElementsByClassName('navbar-burger')).forEach(element => {
+            element.addEventListener('click', () => {
+                element.classList.toggle('is-active');
+                document.getElementById(element.dataset.target).classList.toggle('is-active');
+            });
+        });
     }
 
     function onHashChangeEvent(event) {
@@ -265,34 +276,34 @@
             is undefined or not a string. Expected string, got ${typeof (url)}.`);
         }
 
-        try {
+        try { // is-clickable grow
             /* Create a temp element so we can store the article inside and transform it into a home item. */
-            let temp = document.createElement('temp');
-            temp.insertAdjacentHTML('afterbegin', html);
+            // let temp = document.createElement('temp');
+            // temp.insertAdjacentHTML('afterbegin', html);
 
-            /* Wrap the header in a link so it give the visual feedback of a link. */
-            let title = temp.querySelector('.article-title');
+            // /* Wrap the header in a link so it give the visual feedback of a link. */
+            // let title = temp.querySelector('.article-title');
 
-            if (!title) {
-                throw new Error(`No title found in ${url}.`);
-            }
+            // if (!title) {
+            //     throw new Error(`No title found in ${url}.`);
+            // }
 
-            title.outerHTML = `<a class="article-title-link" href="#${url.split('/').pop().replace('.html', '')}">${title.outerHTML}</a>`;
+            // title.outerHTML = `<a class="article-title-link" href="#${url.split('/').pop().replace('.html', '')}">${title.outerHTML}</a>`;
 
-            /* Transform the article into an item by removing all but the first paragraph. */
-            let paragraphs = temp.querySelectorAll('.article-body p');
+            // /* Transform the article into an item by removing all but the first paragraph. */
+            // let paragraphs = temp.querySelectorAll('.article-body p');
 
-            if (!paragraphs) {
-                throw new Error(`No paragraphs found in ${url}.`);
-            }
+            // if (!paragraphs) {
+            //     throw new Error(`No paragraphs found in ${url}.`);
+            // }
 
-            for (let i = 0; i < paragraphs.length; i++) {
-                if (i === 0) {
-                    paragraphs[i].classList.add('truncate');
-                } else {
-                    paragraphs[i].remove();
-                }
-            }
+            // for (let i = 0; i < paragraphs.length; i++) {
+            //     if (i === 0) {
+            //         paragraphs[i].classList.add('truncate');
+            //     } else {
+            //         paragraphs[i].remove();
+            //     }
+            // }
 
             return temp.innerHTML;
         } catch (error) {
@@ -461,13 +472,13 @@
     }
 
     function setThemeButtonText() {
-        const theme = getTheme(document.location.search);
-        let themeText = '[Dark Mode]';
+        // const theme = getTheme(document.location.search);
+        // let themeText = '[Dark Mode]';
 
-        if (theme === 'dark') {
-            themeText = '[Light Mode]';
-        }
+        // if (theme === 'dark') {
+        //     themeText = '[Light Mode]';
+        // }
 
-        document.getElementById('theme').innerText = themeText;
+        // document.getElementById('theme').innerText = themeText;
     }
 }());
