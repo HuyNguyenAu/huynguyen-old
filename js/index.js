@@ -558,18 +558,18 @@
         return '';
     }
 
-    // function setTheme() {
-    //     const elements = document.querySelectorAll('body, a, h2, p');
-    //     const theme = getTheme(document.location.search);
+    function setTheme() {
+        //     const elements = document.querySelectorAll('body, a, h2, p');
+        //     const theme = getTheme(document.location.search);
 
-    //     for (let i = 0; i < elements.length; i++) {
-    //         if (theme === 'light') {
-    //             elements[i].classList.remove("dark-mode");
-    //         } else {
-    //             elements[i].classList.add("dark-mode");
-    //         }
-    //     }
-    // }
+        //     for (let i = 0; i < elements.length; i++) {
+        //         if (theme === 'light') {
+        //             elements[i].classList.remove("dark-mode");
+        //         } else {
+        //             elements[i].classList.add("dark-mode");
+        //         }
+        //     }
+    }
 
     // function setThemeButtonText() {
     //     // const theme = getTheme(document.location.search);
