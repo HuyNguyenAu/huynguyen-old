@@ -2,6 +2,11 @@
 /* jshint browser: true */
 /*jslint devel: true */
 
+/** TODO
+ * Fix content ghosting caused by image loading.
+ * Add dark mode shadows.
+ */
+
 (function () {
     /* Set the theme before the document loads to stop the page from
     flashing white. */

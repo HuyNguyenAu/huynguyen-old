@@ -5,32 +5,64 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <link rel="stylesheet" href="../css/index.css" />
-    <title>Currently Under Construction</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css"
+        integrity="sha256-WLKGWSIJYerRN8tbNGtXWVYnUM5wMJTXD8eG4NtGcDM=" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/index.css"/>
+
+    <title>Huy Nguyen's Blog</title>
 </head>
 
 <body>
-    <div class="container">
-        <div class="menu">
-            <a href="#">
-                <p>Home</p>
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="#home">
+                <div class="box pt-0 is-shadowless">
+                    <h1 class="title">._.</h1>
+                </div>
             </a>
-            <a href="#archives">
-                <p>Archives</p>
-            </a>
-            <a href="#about">
-                <p>About</p>
+            <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbar">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
             </a>
         </div>
-        <div id="content">
-            <div class="article">
-                <div class="article-header">
-                    <h2 class="article-title">Proident laborum</h2>
-                    <p class="article-subtitle">On <span class="article-date">03/03/2020</span> under <span class="article-category">Test</span>
-                    </p>
+
+        <div id="navbar" class="navbar-menu">
+            <div class="navbar-start">
+                <a class="navbar-item" href="#home">
+                    Home
+                </a>
+                <a class="navbar-item" href="#archives">
+                    Archives
+                </a>
+                <a class="navbar-item" href="#about">
+                    About
+                </a>
+            </div>
+            <div class="navbar-end">
+                <a id="theme" class="navbar-item">
+                   Dark Mode
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div id="content" class="container">
+        <div class="card m-6">
+            <div class="card-image">
+                <figure class="image is-3by1">
+                    <img
+                        src="https://s3.amazonaws.com/ooomf-com-files/wjNV6gWuQkqeuH8txHc9_sylwiabartyzel_unsplash_tatry_03.jpg">
+                </figure>
+            </div>
+            <div class="card-content">
+                <div class="media">
+                    <div class="media-content">
+                        <p class="title is-4">Proident laborum</p>
+                        <p class="subtitle is-6">03/03/2020</p>
+                    </div>
                 </div>
-                <div class="article-body">
-                    <img src="https://s3.amazonaws.com/ooomf-com-files/wjNV6gWuQkqeuH8txHc9_sylwiabartyzel_unsplash_tatry_03.jpg">
+                <div class="content">
                     <p>
                         Integer vitae lectus accumsan, egestas dui eget, ullamcorper urn. In feugiat tortor at
                         turpis rhoncus tincidunt. Duis sed porttitor ante, eget venenatis lectus.
@@ -70,6 +102,14 @@
             </div>
         </div>
     </div>
+
+    <footer class="footer">
+        <div class="content has-text-centered">
+            <button id="go-to-top" class="button">Go to top</button>
+        </div>
+    </footer>
+
+    <script src="js/index.js" defer></script>
 </body>
 
 </html>
