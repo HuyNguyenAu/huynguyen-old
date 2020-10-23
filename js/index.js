@@ -4,7 +4,6 @@
 
 /** TODO
  * Fix content ghosting caused by image loading.
- * Add dark mode shadows.
  */
 
 (function () {
