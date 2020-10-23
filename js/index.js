@@ -46,7 +46,7 @@
         document.title = getTitle(document.location.hash);
     }
 
-    /** Only intialise the burger menu and go to top button once. */
+    /** Only initialise the burger menu and go to top button once. */
     function onDOMContentLoaded() {
         initBurger();
         initNavbarItems();
