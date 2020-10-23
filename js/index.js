@@ -19,7 +19,9 @@
     let signal = controller.signal;
 
     window.addEventListener('load', onLoadEvent);
-    document.addEventListener('DOMContentLoaded', onLoadEvent);
+    // document.addEventListener('DOMContentLoaded', function() {
+    //     onLoadEvent();
+    // });
     // window.addEventListener('hashchange', onHashChangeEvent);
     // window.addEventListener('popstate', onPopStateEvent);
     // // document.getElementById('theme').addEventListener('click', onThemeClicked);
@@ -28,8 +30,8 @@
     function onLoadEvent() {
         initBurger();
 
-        // const page = getPage(document.location.hash);
-        // const theme = getTheme(document.location.search);
+        const page = getPage(document.location.hash);
+        const theme = getTheme(document.location.search);
 
         // if (!theme) {
         //     document.location.search = `theme=light`;
@@ -37,17 +39,17 @@
         //     setThemeButtonText();
         // }
 
-        // if (!page) {
-        //     document.location.hash = '#home';
-        // }
-        // else if (page === 'home') {
-        //     showHome();
-        // } else {
+        if (!page) {
+            document.location.hash = '#home';
+        }
+        else if (page === 'home') {
+            showHome();
+        } else {
 
-        //     showArticle(page);
-        // }
+            showArticle(page);
+        }
 
-        // document.title = getTitle(document.location.hash);
+        document.title = getTitle(document.location.hash);
     }
 
     function initBurger() {
@@ -276,34 +278,27 @@
             is undefined or not a string. Expected string, got ${typeof (url)}.`);
         }
 
-        try { // is-clickable grow
+        try { // 
             /* Create a temp element so we can store the article inside and transform it into a home item. */
-            // let temp = document.createElement('temp');
-            // temp.insertAdjacentHTML('afterbegin', html);
+            let temp = document.createElement('temp');
+            temp.insertAdjacentHTML('afterbegin', html);
 
-            // /* Wrap the header in a link so it give the visual feedback of a link. */
-            // let title = temp.querySelector('.article-title');
+            temp.querySelector('.card').classList.add('is-clickable', 'grow');
 
-            // if (!title) {
-            //     throw new Error(`No title found in ${url}.`);
-            // }
+            /* Transform the article into an item by removing all but the first paragraph. */
+            let paragraphs = temp.querySelectorAll('.content p');
 
-            // title.outerHTML = `<a class="article-title-link" href="#${url.split('/').pop().replace('.html', '')}">${title.outerHTML}</a>`;
+            if (!paragraphs) {
+                throw new Error(`No paragraphs found in ${url}.`);
+            }
 
-            // /* Transform the article into an item by removing all but the first paragraph. */
-            // let paragraphs = temp.querySelectorAll('.article-body p');
-
-            // if (!paragraphs) {
-            //     throw new Error(`No paragraphs found in ${url}.`);
-            // }
-
-            // for (let i = 0; i < paragraphs.length; i++) {
-            //     if (i === 0) {
-            //         paragraphs[i].classList.add('truncate');
-            //     } else {
-            //         paragraphs[i].remove();
-            //     }
-            // }
+            for (let i = 0; i < paragraphs.length; i++) {
+                if (i === 0) {
+                    paragraphs[i].classList.add('truncate');
+                } else {
+                    paragraphs[i].remove();
+                }
+            }
 
             return temp.innerHTML;
         } catch (error) {
