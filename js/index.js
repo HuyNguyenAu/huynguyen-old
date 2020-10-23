@@ -5,7 +5,7 @@
 (function () {
     /* Set the theme before the document loads to stop the page from
     flashing white. */
-    setTheme();
+    // setTheme();
     /* A dictionary that consists of the url(key), and the
     vertical scrol position (value). */
     let verticalScrollPositionHistory = [];
@@ -19,19 +19,14 @@
     let signal = controller.signal;
 
     window.addEventListener('load', onLoadEvent);
-    // document.addEventListener('DOMContentLoaded', function() {
-    //     onLoadEvent();
-    // });
-    // window.addEventListener('hashchange', onHashChangeEvent);
-    // window.addEventListener('popstate', onPopStateEvent);
-    // // document.getElementById('theme').addEventListener('click', onThemeClicked);
-    // document.getElementById('go-to-top').addEventListener('click', onGoToTopClicked);
+    document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
+    window.addEventListener('hashchange', onHashChangeEvent);
+    window.addEventListener('popstate', onPopStateEvent);
+    // document.getElementById('theme').addEventListener('click', onThemeClicked);
 
     function onLoadEvent() {
-        initBurger();
-
         const page = getPage(document.location.hash);
-        const theme = getTheme(document.location.search);
+        // const theme = getTheme(document.location.search);
 
         // if (!theme) {
         //     document.location.search = `theme=light`;
@@ -45,11 +40,15 @@
         else if (page === 'home') {
             showHome();
         } else {
-
             showArticle(page);
         }
 
         document.title = getTitle(document.location.hash);
+    }
+
+    function onDOMContentLoaded() {
+        initBurger();
+        initGoToTopButton();
     }
 
     function initBurger() {
@@ -61,8 +60,25 @@
         });
     }
 
+    function initGoToTopButton() {
+        document.getElementById('go-to-top').addEventListener('click', function () {
+            /* There is a bug where if the vertical scroll position is at 0 or scrollMaxY,
+            the returned value is mostly scrollMaxY. To prevent this, we just need to set either at
+            1 or window.scrollMaxY - 1. */
+            window.scrollTo(0, 1);
+        });
+    }
+
+    function initHome() {
+        Array.from(document.getElementsByClassName('card')).forEach(card => {
+            card.addEventListener('click', function (e) {
+                document.location.hash = e.currentTarget.getAttribute('url').split('/').pop().replace('.html', '');
+            });
+        });
+    }
+
     function onHashChangeEvent(event) {
-        rememberVerticalScrollPosition(getPage(event.oldURL));
+        rememberVerticalScrollPosition(getPage(event.oldURL), lastVerticalScrollPosition);
         onLoadEvent();
     }
 
@@ -117,7 +133,7 @@
         /* If we cannot append the error reason to the body, it means the document is corrupted. */
         if (articleBody) {
             articleBody.innerHTML += `<p>${error}<p>`;
-            setTheme();
+            // setTheme();
         } else {
             showCriticalErrorPage();
         }
@@ -129,7 +145,8 @@
                 Promise.all(parseArticles(json), false)
                     .then(() => {
                         scrollToY(getPage(document.location.hash), verticalScrollPositionHistory);
-                        setTheme();
+                        // setTheme();
+                        initHome();
                     })
             );
 
@@ -191,7 +208,7 @@
                 content.insertAdjacentHTML("afterbegin", html);
             } else {
                 content.innerHTML = html;
-                setTheme();
+                // setTheme();
                 scrollToY(getPage(document.location.hash), verticalScrollPositionHistory);
             }
         } catch (error) {
@@ -300,6 +317,9 @@
                 }
             }
 
+            /* Add link. */
+            temp.querySelector('.card').setAttribute('url', url);
+
             return temp.innerHTML;
         } catch (error) {
             showError(error);
@@ -318,13 +338,6 @@
         window.location.href = 'html/critical.html';
     }
 
-    function onGoToTopClicked() {
-        /* There is a bug where if the vertical scroll position is at 0 or scrollMaxY,
-       the returned value is mostly scrollMaxY. To prevent this, we just need to set either at
-       1 or window.scrollMaxY - 1. */
-        window.scrollTo(0, 1);
-    }
-
     function onThemeClicked() {
         const theme = getTheme(document.location.search);
         let newTheme = 'theme=dark';
@@ -336,144 +349,208 @@
         document.location.search = newTheme;
     }
 
-    /** Store the vertical scroll postision.
+    /** Store the vertical scroll position.
+    * Do nothing on error.
+    * Set lastVerticalScrollPosition to 1 if not a number.
     * 
-    * @param String page
+    * @param string page
+    * @param number lastVerticalScrollPosition
+    * 
+    * @return void
     */
-    function rememberVerticalScrollPosition(page) {
+    function rememberVerticalScrollPosition(page, lastVerticalScrollPosition) {
         if (typeof (page) !== 'string') {
-            throw new Error(`The parameter page in the function rememberVerticalScrollPosition 
-            is undefined or not a string. Expected string, got ${typeof (page)}.`);
+            errorParam('string', page, 'page', 'rememberVerticalScrollPosition');
+            return;
         }
 
-        verticalScrollPositionHistory[page] =
-            getVerticalScrollPosition(lastVerticalScrollPosition);
+        if (typeof (lastVerticalScrollPosition) !== 'number') {
+            errorParam('number', lastVerticalScrollPosition, 'lastVerticalScrollPosition', 'rememberVerticalScrollPosition');
+            lastVerticalScrollPosition = 1;
+        }
+
+        try {
+            verticalScrollPositionHistory[page] = getVerticalScrollPosition(lastVerticalScrollPosition);
+        } catch (error) {
+            error(`Failed to set last vertical scroll position with value of ${lastVerticalScrollPosition} at page ${page}.`);
+        }
     }
 
-    /** Return an adjusted vertical scroll postision value based on the
-    * given vertical scroll postision;
+    /** Get the adjusted vertical scroll position value based on the
+    * given vertical scroll postision.
+    * Returns 1 on error.
     * 
-    * @param String page
+    * @param string lastVerticalScrollPosition
     * 
-    * @returns String
+    * @return string
     */
     function getVerticalScrollPosition(lastVerticalScrollPosition) {
         if (typeof (lastVerticalScrollPosition) !== 'number') {
-            throw new Error(`The parameter lastVerticalScrollPosition in the 
-            function getVerticalScrollPosition is undefined or not a number. 
-            Expected number, got ${typeof (lastVerticalScrollPosition)}.`);
+            errorParam('number', lastVerticalScrollPosition, 'lastVerticalScrollPosition', 'getVerticalScrollPosition');
+            return 1;
         }
 
-        let verticalScrollPosition = 1;
-
-        /* There is a bug where if the vertical scroll position is at 0 or scrollMaxY,
-       the returned value is mostly scrollMaxY. To prevent this, we just need to set either at
-       1 or window.scrollMaxY - 1. */
-        if (lastVerticalScrollPosition <= 0) {
-            verticalScrollPosition = 1;
-        } else if (lastVerticalScrollPosition >= window.scrollMaxY) {
-            verticalScrollPosition = window.scrollMaxY - 1;
-        } else {
-            verticalScrollPosition = lastVerticalScrollPosition;
+        try {
+            /* There is a bug where if the vertical scroll position is at 0 or scrollMaxY, then
+           the returned value is mostly scrollMaxY. To prevent this, we just need to set either
+           1 or window.scrollMaxY - 1. */
+            if (lastVerticalScrollPosition <= 0) {
+                return 1;
+            } else if (lastVerticalScrollPosition >= window.scrollMaxY) {
+                return window.scrollMaxY - 1;
+            } else {
+                return lastVerticalScrollPosition;
+            }
+        } catch (error) {
+            error(`Failed to get last vertical scroll position with ${lastVerticalScrollPosition} at scrollMaxY value of ${window.scrollMaxY}.`);
         }
 
-        return verticalScrollPosition;
+        return 1;
     }
 
     /** Return the title string from a given page value.
+     * Returns empty string on error.
      * 
-     * @param String page
+     * @param string page
      * 
-     * @returns String
+     * @returns string
     */
     function getTitle(page) {
         if (typeof (page) !== 'string') {
-            throw new Error(`The parameter page in the function setTitle is 
-            undefined or not a string. Expected string, got ${typeof (page)}.`);
+            errorParam('string', page, 'page', 'getTitle');
+            return '';
         }
 
-        return `${toPascalCase(getPage(page).replace('_', ' '))} - Huy Nguyen`;
+        try {
+            const title = toPascalCase(getPage(page).replace('_', ' '));
+
+            if (title) {
+                return `${title} - Huy Nguyen`;
+            }
+        } catch (error) {
+            error(`Failed to get title from ${page}.`);
+        }
     }
 
-    /** Convert a string to Pascal case.
+    /** Convert the given string to Pascal case.
+     * Returns empty string on error.
+     * Source: https://stackoverflow.com/questions/4068573/convert-string-to-pascal-case-aka-uppercamelcase-in-javascript
      * 
-     * @param String string
+     * @param string value
      * 
-     * @returns String
+     * @return string
     */
-    function toPascalCase(string) {
-        /* Source: https://stackoverflow.com/questions/4068573/convert-string-to-pascal-case-aka-uppercamelcase-in-javascript */
-        if (typeof (string) !== 'string') {
-            throw new Error(`The parameter string in the function toPascalCase 
-            is undefined or not a string. Expected string, got ${typeof (string)}.`);
+    function toPascalCase(value) {
+        if (typeof (value) !== 'string') {
+            errorParam('string', value, 'value', 'toPascalCase');
+            return '';
         }
 
-        return string.replace(/\w+/g,
-            function (word) { return word[0].toUpperCase() + word.slice(1).toLowerCase(); });
+        try {
+            return value.replace(/\w+/g, function (word) { return word[0].toUpperCase() + word.slice(1).toLowerCase(); });
+        } catch (error) {
+            error(`Failed to convert ${value} to Pascal case.`);
+        }
+
+        return '';
     }
 
-    /** Return the page value from a given url.
+    /** Get the hash from the given url.
+     * Returns empty string on error.
      * 
-     * @param String url
+     * @param string url
      * 
-     * @returns String
+     * @return string
     */
     function getPage(url) {
         if (typeof (url) !== 'string') {
-            throw new Error(`The parameter url in the function getPage is 
-            undefined or not a string. Expected string, got ${typeof (url)}.`);
+            errorParam('string', url, 'url', 'getPage');
+            return '';
         }
 
-        return url.split('#').pop().split('?')[0];
+        try {
+            return url.split('#').pop().split('?')[0];
+        } catch (_) {
+            error(`Failed to get page from ${url}.`);
+        }
+
+        return '';
     }
 
-    /** Return the theme value from a given url.
+    /** Get the theme from the given url.
+     * Returns empty string on error.
      * 
-     * @param String url
+     * @param string url
      * 
-     * @returns String
+     * @return string
     */
     function getTheme(url) {
         if (typeof (url) !== 'string') {
-            throw new Error(`The parameter url in the function getTheme is 
-            undefined or not a string. Expected string, got ${typeof (url)}.`);
+            errorParam('string', url, 'url', 'getTheme');
+            return '';
         }
 
-        const theme = url.split('?').pop();
-        let value = '';
+        try {
+            const theme = url.split('?').pop();
 
-        if (theme.startsWith('theme=')) {
-            const themeValue = theme.split('=').pop();
+            if (theme.startsWith('theme=')) {
+                const themeValue = theme.split('=').pop();
 
-            if (themeValue === 'light' || themeValue === 'dark') {
-                value = themeValue;
+                if (themeValue === 'light' || themeValue === 'dark') {
+                    return themeValue;
+                }
             }
+        } catch (_) {
+            error(`Failed to get theme from ${url}.`);
         }
 
-        return value;
+        return '';
     }
 
-    function setTheme() {
-        const elements = document.querySelectorAll('body, a, h2, p');
-        const theme = getTheme(document.location.search);
+    // function setTheme() {
+    //     const elements = document.querySelectorAll('body, a, h2, p');
+    //     const theme = getTheme(document.location.search);
 
-        for (let i = 0; i < elements.length; i++) {
-            if (theme === 'light') {
-                elements[i].classList.remove("dark-mode");
-            } else {
-                elements[i].classList.add("dark-mode");
-            }
-        }
+    //     for (let i = 0; i < elements.length; i++) {
+    //         if (theme === 'light') {
+    //             elements[i].classList.remove("dark-mode");
+    //         } else {
+    //             elements[i].classList.add("dark-mode");
+    //         }
+    //     }
+    // }
+
+    // function setThemeButtonText() {
+    //     // const theme = getTheme(document.location.search);
+    //     // let themeText = '[Dark Mode]';
+
+    //     // if (theme === 'dark') {
+    //     //     themeText = '[Light Mode]';
+    //     // }
+
+    //     // document.getElementById('theme').innerText = themeText;
+    // }
+
+    /** Write parameter error message.
+     * 
+     * @param string expected
+     * @param any actual
+     * @param string param
+     * @param string method
+     * 
+     * @return void
+     */
+    function errorParam(expected, actual, param, method) {
+        console.error(`Unexpected parameter ${param} in method ${method}. Expected ${expected}, got ${typeof (actual)}.`);
     }
 
-    function setThemeButtonText() {
-        // const theme = getTheme(document.location.search);
-        // let themeText = '[Dark Mode]';
-
-        // if (theme === 'dark') {
-        //     themeText = '[Light Mode]';
-        // }
-
-        // document.getElementById('theme').innerText = themeText;
+    /** Write error message.
+     * 
+     * @param string message
+     * 
+     * @return void
+     */
+    function error(message) {
+        console.error(message);
     }
 }());
