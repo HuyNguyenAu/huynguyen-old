@@ -190,7 +190,7 @@
             /* If we cannot append the error reason to the body, it means the document is corrupted. */
             if (errorMessage) {
                 errorMessage.insertAdjacentHTML('afterend', `<p>${error}<p>`);
-                // setTheme();
+                setTheme();
             } else {
                 errorCritical();
             }
@@ -209,8 +209,8 @@
                 .then((json) =>
                     Promise.all(parseArticles(json), false)
                         .then(() => {
+                            setTheme();
                             scrollToY(getPage(document.location.hash), verticalScrollPositionHistory);
-                            // setTheme();
                             initHome();
                         })
                 );
@@ -282,7 +282,7 @@
                 content.insertAdjacentHTML("afterbegin", html);
             } else {
                 content.innerHTML = html;
-                // setTheme();
+                setTheme();
                 scrollToY(getPage(document.location.hash), verticalScrollPositionHistory);
             }
         } catch (e) {
@@ -576,17 +576,22 @@
         return 'light';
     }
 
+    /** Set the theme based on the theme defined in the document.location.search. */
     function setTheme() {
-        //     const elements = document.querySelectorAll('body, a, h2, p');
-        //     const theme = getTheme(document.location.search);
+        try {
+            const elements = document.querySelectorAll('html, body, nav, footer, .card, .box, h1, p, button, a');
+            const theme = getTheme(document.location.search);
 
-        //     for (let i = 0; i < elements.length; i++) {
-        //         if (theme === 'light') {
-        //             elements[i].classList.remove("dark-mode");
-        //         } else {
-        //             elements[i].classList.add("dark-mode");
-        //         }
-        //     }
+            for (let i = 0; i < elements.length; i++) {
+                if (theme === 'light') {
+                    elements[i].classList.remove('has-background-dark', 'has-text-white');
+                } else {
+                    elements[i].classList.add('has-background-dark', 'has-text-white');
+                }
+            }
+        } catch (e) {
+            error(`Failed to set theme.`);
+        }
     }
 
     /** Change the theme button text to current theme. */
