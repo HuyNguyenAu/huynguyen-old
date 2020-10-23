@@ -157,7 +157,13 @@
             }
 
             get(`https://raw.githubusercontent.com/HuyNguyenAu/huynguyen/master/html/${page}.html`)
-                .then((html) => showContent(html, false));
+                .then((html) => {
+                    showContent(html, false);
+
+                    if (page === "archives") {
+                        initHome();
+                    }
+                });
         } catch (e) {
             error(`Failed to show article with page ${page}. ${e}.`);
             showError(e);
