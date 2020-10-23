@@ -583,7 +583,7 @@
     /** Set the theme based on the theme defined in the document.location.search. */
     function setTheme() {
         try {
-            const elements = document.querySelectorAll('html, body, nav, footer, .card, .box, h1, p, button, a');
+            const elements = document.querySelectorAll('html, body, nav, footer, .card, .box, h1, p, button, a, #navbar');
             const theme = getTheme(document.location.search);
 
             for (let i = 0; i < elements.length; i++) {
