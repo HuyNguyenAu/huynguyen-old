@@ -110,10 +110,13 @@ def buildArchives(articles):
         # This assumes the list of articles are sorted.
         if lastMonthYear != monthYear:
             lastMonthYear = monthYear
-            archiveDate = article.html.new_tag("h2")
-            archiveDate["class"] = "archive-date"
+            box = article.html.new_tag("div")
+            box["class"] = "box m-6"
+            archiveDate = article.html.new_tag("p")
+            archiveDate["class"] = "title"
             archiveDate.append(monthYear)
-            content.append(archiveDate.prettify())
+            box.append(archiveDate)
+            content.append(box.prettify())
 
         content.append(article.html.prettify())
 
