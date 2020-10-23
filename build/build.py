@@ -52,9 +52,10 @@ def parseArticles(working_dir):
             article = createHTMLFromDir(working_dir, item)
             articles.append(
                 Article(
-                    article.find("h2", {"class": "article-title"}).string,
-                    article.find("span", {"class": "article-date"}).string,
-                    article.find("span", {"class": "article-category"}).string,
+                    article.find("p", {"class": "title"}).string,
+                    article.find("p", {"class": "subtitle"}).string,
+                    "",
+                    # article.find("span", {"class": "article-category"}).string,
                     "https://raw.githubusercontent.com/HuyNguyenAu/huynguyen/master/{}".format(
                         getLocalPath(item).replace("\\", "/")
                     ),
@@ -71,18 +72,8 @@ def buildContent(items, url):
     articles = []
 
     for article in items:
-        newLink = article.html.new_tag("a")
+        paragraphs = article.html.find("div", {"class": "card-content"}).find("div", {"class": "content"}, recursive=False).findAll("p")
 
-        if url:
-            newLink["href"] = article.url
-        else:
-            newLink["href"] = "#{}".format(
-                article.url.split("/html/").pop().replace(".html", "")
-            )
-
-        article.html.find("h2", {"class": "article-title"}).wrap(newLink)
-
-        paragraphs = article.html.find("div", {"class": "article-body"}).findAll("p")
         for i in range(0, len(paragraphs)):
             if i == 0:
                 paragraphs[i]["class"] = "truncate"
