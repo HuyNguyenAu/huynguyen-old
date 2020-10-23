@@ -22,17 +22,17 @@
     document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
     window.addEventListener('hashchange', onHashChangeEvent);
     window.addEventListener('popstate', onPopStateEvent);
-    // document.getElementById('theme').addEventListener('click', onThemeClicked);
+    document.getElementById('theme').addEventListener('click', onThemeButtonClicked);
 
     function onLoad() {
         const page = getPage(document.location.hash);
-        // const theme = getTheme(document.location.search);
+        const theme = getTheme(document.location.search);
 
-        // if (!theme) {
-        //     document.location.search = `theme=light`;
-        // } else {
-        //     setThemeButtonText();
-        // }
+        if (!theme) {
+            document.location.search = `theme=light`;
+        } else {
+            setThemeButtonText();
+        }
 
         if (!page) {
             document.location.hash = '#home';
@@ -547,7 +547,7 @@
     }
 
     /** Get the theme from the given url.
-     * Returns empty string on error.
+     * Returns 'light' string on error.
      * 
      * @param String url
      * 
@@ -556,7 +556,7 @@
     function getTheme(url) {
         if (typeof (url) !== 'string') {
             errorParam('string', url, 'url', 'getTheme');
-            return '';
+            return 'light';
         }
 
         try {
@@ -573,7 +573,7 @@
             error(`Failed to get theme from ${url}. ${e}.`);
         }
 
-        return '';
+        return 'light';
     }
 
     function setTheme() {
@@ -589,16 +589,21 @@
         //     }
     }
 
-    // function setThemeButtonText() {
-    //     // const theme = getTheme(document.location.search);
-    //     // let themeText = '[Dark Mode]';
+    /** Change the theme button text to current theme. */
+    function setThemeButtonText() {
+        try {
+            const theme = getTheme(document.location.search);
+            let themeText = 'Dark Mode';
 
-    //     // if (theme === 'dark') {
-    //     //     themeText = '[Light Mode]';
-    //     // }
+            if (theme === 'dark') {
+                themeText = 'Light Mode';
+            }
 
-    //     // document.getElementById('theme').innerText = themeText;
-    // }
+            document.getElementById('theme').innerText = themeText;
+        } catch (e) {
+            error(`Failed to set themem buttion text with theme ${theme} and theme button ${document.getElementById('theme')}. ${e}.`);
+        }
+    }
 
     /** Write parameter error message.
      * 
