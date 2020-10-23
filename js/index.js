@@ -20,34 +20,34 @@
 
     window.addEventListener('load', onLoadEvent);
     document.addEventListener('DOMContentLoaded', onLoadEvent);
-    window.addEventListener('hashchange', onHashChangeEvent);
-    window.addEventListener('popstate', onPopStateEvent);
-    // document.getElementById('theme').addEventListener('click', onThemeClicked);
-    document.getElementById('go-to-top').addEventListener('click', onGoToTopClicked);
+    // window.addEventListener('hashchange', onHashChangeEvent);
+    // window.addEventListener('popstate', onPopStateEvent);
+    // // document.getElementById('theme').addEventListener('click', onThemeClicked);
+    // document.getElementById('go-to-top').addEventListener('click', onGoToTopClicked);
 
     function onLoadEvent() {
         initBurger();
 
-        const page = getPage(document.location.hash);
-        const theme = getTheme(document.location.search);
+        // const page = getPage(document.location.hash);
+        // const theme = getTheme(document.location.search);
 
-        if (!theme) {
-            document.location.search = `theme=light`;
-        } else {
-            setThemeButtonText();
-        }
+        // if (!theme) {
+        //     document.location.search = `theme=light`;
+        // } else {
+        //     setThemeButtonText();
+        // }
 
-        if (!page) {
-            document.location.hash = '#home';
-        }
-        else if (page === 'home') {
-            showHome();
-        } else {
+        // if (!page) {
+        //     document.location.hash = '#home';
+        // }
+        // else if (page === 'home') {
+        //     showHome();
+        // } else {
 
-            showArticle(page);
-        }
+        //     showArticle(page);
+        // }
 
-        document.title = getTitle(document.location.hash);
+        // document.title = getTitle(document.location.hash);
     }
 
     function initBurger() {
