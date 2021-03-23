@@ -9,3 +9,11 @@ html {
 .grow:hover {
     transform: scale(1.01);
 }
+
+.expand {
+    height: 100vh !important;
+}
+
+.footer {
+    padding: 3rem 1.5rem !important;
+}
