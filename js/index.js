@@ -721,7 +721,7 @@
           "has-text-white"
         );
       } else {
-        if (element.classList.contains("card")) {
+        if (element.classList.contains("card") ||element.classList.contains("box") ) {
           element.classList.add("card-shadow-white");
         }
 
