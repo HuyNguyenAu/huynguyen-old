@@ -4,3 +4,4 @@ article.html
 base.html
 critical.html
 error.html
+resume.html
