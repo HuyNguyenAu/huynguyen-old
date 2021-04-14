@@ -77,7 +77,7 @@ def buildContent(items, url):
         card["class"].append("grow")
         card["url"] = article.url
 
-        paragraphs = article.html.find("div", {"class": "card-content"}).find("div", {"class": "content"}, recursive=False).findAll("p")
+        paragraphs = article.html.find("div", {"class": "card-content"}).find("div", {"class": "content"}, recursive=False).findAll(["p", "div"])
 
         for i in range(0, len(paragraphs)):
             if i == 0:
