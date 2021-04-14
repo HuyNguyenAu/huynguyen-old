@@ -332,12 +332,12 @@
   /**
    * Return the title string from a given page value.
    *
-   * @param String page
+   * @param String location
    *
    * @return String
    */
   function getTitle(location) {
-    const title = toPascalCase(getHash(location).replace('_', ' '));
+    const title = toPascalCase(getHash(location).replaceAll('_', ' '));
 
     return `${title} - Huy Nguyen`;
   }
