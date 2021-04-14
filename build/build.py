@@ -19,13 +19,13 @@ def getLocalPath(item):
     local_path = item
 
     if "." in item:
-        local_path = "{}\\{}".format(item.split(".").pop(), item)
+        local_path = "{}/{}".format(item.split(".").pop(), item)
 
     return local_path
 
 
 def getAbsolutePath(working_dir, item):
-    return "{}\\{}".format(working_dir, getLocalPath(item))
+    return "{}/{}".format(working_dir, getLocalPath(item))
 
 
 def searchPath(working_dir, items):
@@ -140,7 +140,7 @@ def buildJSON(articles):
 
 
 def writeFile(working_dir, fileName, contents):
-    writer = open("{}\\{}".format(working_dir, fileName), "w")
+    writer = open("{}/{}".format(working_dir, fileName), "w")
     writer.write(contents)
     writer.close()
 
