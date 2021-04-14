@@ -265,7 +265,8 @@
     temp.querySelector('.card').classList.add('is-clickable', 'grow');
 
     /* Transform the article into a home item by removing all but the first paragraph. */
-    let paragraphs = temp.querySelectorAll('.content p div');
+    let paragraphs = temp.querySelectorAll('.content p, .content div');
+    console.log(paragraphs);
 
     for (let i = 0; i < paragraphs.length; i++) {
       if (i === 0) {
